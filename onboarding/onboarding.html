@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon32.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #16a34a;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      text-align: center;
+      max-width: 560px;
+      width: 100%;
+      padding: 20px;
+    }
+    .step { display: none; }
+    .step.active { display: block; }
+    .logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      filter: drop-shadow(0 8px 18px rgba(22, 163, 74, 0.28));
+      object-fit: contain;
+    }
+    .step-indicator {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .small-note {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 14px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .lang-title {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .lang-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .lang-btn {
+      padding: 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-family: inherit;
+      cursor: pointer;
+      background: white;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .lang-btn:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+    .lang-btn.selected {
+      border-color: var(--green);
+      background: var(--green);
+      color: white;
+      font-weight: 600;
+    }
+    .btn-main {
+      width: 100%;
+      padding: 14px;
+      border-radius: 28px;
+      border: none;
+      background: var(--green);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+    .btn-main:hover {
+      background: #15803d;
+      box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+    }
+    .features {
+      text-align: left;
+      margin: 20px 0 24px;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .feature-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(229, 231, 235, 0.9);
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .feature-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .feature-name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .feature-desc {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .feature-points {
+      margin-top: 10px;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    .feature-points li + li {
+      margin-top: 4px;
+    }
+    .privacy-panel {
+      margin-top: 12px;
+      padding: 18px 18px 18px 20px;
+      position: relative;
+      overflow: hidden;
+      border: 1.5px solid rgba(22, 163, 74, 0.34);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(22, 163, 74, 0.16), rgba(14, 165, 233, 0.12)),
+        rgba(255, 255, 255, 0.94);
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
+    }
+    .privacy-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 5px;
+      background: linear-gradient(180deg, var(--green), #0ea5e9);
+    }
+    .privacy-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .privacy-icon {
+      width: 42px;
+      height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 1px solid rgba(22, 163, 74, 0.18);
+      border-radius: 14px;
+      background: white;
+      font-size: 21px;
+      box-shadow: 0 8px 18px rgba(22, 163, 74, 0.16);
+    }
+    .privacy-eyebrow {
+      color: var(--green);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .privacy-panel h2 {
+      color: var(--text);
+      font-size: 19px;
+      line-height: 1.25;
+      margin: 0;
+    }
+    .privacy-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .privacy-badges span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 5px 10px;
+      border: 1px solid rgba(22, 163, 74, 0.2);
+      border-radius: 999px;
+      color: #166534;
+      background: rgba(255, 255, 255, 0.82);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .privacy-points {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 16px;
+      padding-left: 18px;
+      color: #4b5563;
+      font-size: 13.2px;
+      line-height: 1.5;
+      position: relative;
+      z-index: 1;
+    }
+    .privacy-points li::marker {
+      color: var(--green);
+    }
+    .github-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(22, 163, 74, 0.24);
+      border-radius: 14px;
+      color: var(--text);
+      background: white;
+      text-decoration: none;
+      font-size: 12.8px;
+      transition: all 0.15s;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+    .github-link span:first-child {
+      color: #166534;
+      font-weight: 800;
+    }
+    .github-link strong {
+      flex: 1;
+      font-size: 13.5px;
+      font-weight: 800;
+    }
+    .github-link:hover {
+      border-color: rgba(22, 163, 74, 0.5);
+      color: var(--green);
+      transform: translateY(-1px);
+    }
+    .home-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 16px 0 24px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 13px;
+      background: white;
+    }
+    .btn-secondary {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      margin-top: 12px;
+      text-decoration: underline;
+    }
+    .btn-secondary:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      .container { max-width: 100%; }
+      .lang-grid { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="step active" id="step1"></div>
+    <div class="step" id="step2"></div>
+    <div class="step" id="step3"></div>
+  </div>
+
+  <script src="../i18n/en.js"></script>
+  <script src="../i18n/es.js"></script>
+  <script src="../i18n/vi.js"></script>
+  <script src="../i18n/onboarding.js"></script>
+  <script src="../shared/dexie.min.js"></script>
+  <script src="../shared/idb.js"></script>
+  <script src="onboarding.js"></script>
+</body>
+</html>

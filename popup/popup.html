@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offiqa</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon32.png">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+<div class="header">
+  <img class="header-logo" src="../icons/icon32.png" alt="" width="28" height="28">
+  <span class="header-title">Offiqa</span>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn" data-tab="memory">Ghi chú</button>
+  <button class="tab-btn" data-tab="bookmarks">Dấu trang</button>
+  <button class="tab-btn" data-tab="data">Sao chép</button>
+</div>
+
+<div class="tab-nav-row2">
+  <button class="tab-btn" data-tab="snippets">Gõ nhanh</button>
+  <button class="tab-btn active" data-tab="cleanup">Dọn dẹp</button>
+  <button class="tab-btn" data-tab="settings">Cài đặt</button>
+</div>
+
+<div class="tab-content active" id="tab-cleanup">
+  <div class="card-title" style="margin-bottom:4px">Dọn dẹp trình duyệt</div>
+  <div class="card-desc">Giải phóng dung lượng và tăng quyền riêng tư</div>
+
+  <div class="section-title">Chọn mục cần dọn</div>
+  <div class="cleanup-items">
+    <label class="checkbox-row">
+      <input type="checkbox" id="cb-cookies" checked>
+      <div>
+        <div class="checkbox-label">Dữ liệu trang</div>
+        <div class="checkbox-sublabel">Không bao gồm phiên đăng nhập</div>
+      </div>
+    </label>
+    <label class="checkbox-row">
+      <input type="checkbox" id="cb-cache" checked>
+      <div>
+        <div class="checkbox-label">Ảnh và tệp bộ nhớ đệm</div>
+      </div>
+    </label>
+    <label class="checkbox-row">
+      <input type="checkbox" id="cb-history" checked>
+      <div>
+        <div class="checkbox-label">Lịch sử duyệt web</div>
+      </div>
+    </label>
+    <label class="checkbox-row">
+      <input type="checkbox" id="cb-downloads">
+      <div>
+        <div class="checkbox-label">Lịch sử tải xuống</div>
+      </div>
+    </label>
+    <label class="checkbox-row">
+      <input type="checkbox" id="cb-localstorage">
+      <div>
+        <div class="checkbox-label">Bộ nhớ cục bộ</div>
+        <div class="checkbox-sublabel">Có thể đăng xuất một số trang</div>
+      </div>
+    </label>
+    <label class="checkbox-row">
+      <input type="checkbox" id="cb-sessions">
+      <div>
+        <div class="checkbox-label">Phiên đăng nhập</div>
+        <div class="checkbox-sublabel">Bỏ chọn để giữ đăng nhập</div>
+      </div>
+    </label>
+  </div>
+
+  <div class="time-row">
+    <span class="time-label">Khoảng thời gian</span>
+    <select class="input" id="cleanup-time" style="max-width:150px">
+      <option value="1">1 giờ qua</option>
+      <option value="24" selected>24 giờ qua</option>
+      <option value="168">7 ngày qua</option>
+      <option value="720">30 ngày qua</option>
+      <option value="0">Tất cả</option>
+    </select>
+  </div>
+  <div class="cleanup-estimate" id="cleanup-estimate">Đang ước tính số mục có thể đếm...</div>
+
+  <div class="section-title">Không dọn các trang này</div>
+  <div class="card-desc" style="margin-bottom:6px">Chỉ áp dụng cho cookie, cache và dữ liệu site</div>
+  <div class="exceptions-box" id="exceptions-list">
+    <span style="color:#9ca3af;font-size:12px">Chưa có ngoại lệ</span>
+  </div>
+  <div class="add-exception-row">
+    <input type="text" class="input" id="exception-input" placeholder="Nhập tên trang (vd: gmail.com)">
+    <button class="btn btn-sm btn-primary" id="btn-add-exception">+ Thêm trang</button>
+  </div>
+
+  <button class="btn btn-primary btn-full cleanup-action" id="btn-cleanup">
+    <span class="cleanup-action-title" id="cleanup-button-title">Dọn dẹp ngay</span>
+    <span class="cleanup-action-subtitle" id="cleanup-button-subtitle"><span id="cleanup-count">0</span> loại dữ liệu sẽ được dọn</span>
+  </button>
+</div>
+
+<div class="tab-content" id="tab-memory">
+  <div class="card" id="page-notes-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Ghi chú trang</div>
+        <div class="card-desc">Lưu lời nhắc ngắn cho trang hiện tại hoặc toàn bộ domain.</div>
+      </div>
+      <button class="btn btn-sm" id="btn-goto-page" title="Trang này" style="font-size:11px">Trang<br>này</button>
+    </div>
+    <div class="page-context-preview" id="page-note-context" hidden>
+      <div class="page-context-title" id="page-note-context-title"></div>
+      <div class="page-context-meta" id="page-note-context-meta"></div>
+    </div>
+    <div class="note-scope-btns">
+      <button class="scope-btn active" data-scope="page">Trang này</button>
+      <button class="scope-btn" data-scope="domain">Toàn bộ domain</button>
+    </div>
+    <textarea class="input" id="page-note-text" placeholder="Viết ghi chú nhanh..." rows="3"></textarea>
+    <div class="note-editor-meta">
+      <div class="note-editor-status" id="page-note-status">Chưa có ghi chú cho ngữ cảnh này.</div>
+      <button type="button" class="btn btn-sm" id="btn-reset-note-editor" hidden>Nhập lại</button>
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px" id="btn-save-note">Lưu ghi chú</button>
+    <p class="hint" style="margin-top:6px">Khi có ghi chú, trên trang sẽ luôn hiện một nhãn nhỏ ở góc dưới phải.</p>
+  </div>
+
+  <div class="card" id="saved-page-notes-card">
+    <div class="card-title">Ghi chú đã lưu</div>
+    <div class="card-desc">Ghi chú URL chỉ bám đúng một liên kết. Ghi chú domain sẽ theo cả website.</div>
+    <div class="saved-notes-list scroll-area" id="saved-notes-list">
+      <div class="empty-state">
+        <div class="empty-state-icon">📝</div>
+        Chưa có ghi chú nào
+      </div>
+    </div>
+  </div>
+
+  <div class="card personal-memory-card" id="personal-memory-card">
+    <div class="card-title">Personal memory</div>
+    <div class="card-desc">Quick notes, reminders, checklists, and plans not tied to a URL.</div>
+    <select class="input memory-type-select" id="memory-type">
+      <option value="note">Quick note</option>
+      <option value="reminder">Reminder</option>
+      <option value="checklist">Checklist</option>
+      <option value="plan">Plan</option>
+    </select>
+    <div class="memory-schedule-row" id="memory-schedule-row">
+      <input type="date" class="input input-date" id="memory-due" aria-label="Due date (optional)">
+      <input type="time" class="input input-time" id="memory-due-time" aria-label="Due time (optional)">
+    </div>
+    <div class="memory-advance-row" id="memory-advance-row">
+      <span class="memory-advance-label">Nhắc trước</span>
+      <input type="number" class="input memory-advance-input" id="memory-advance-input" min="0" max="999" step="1" inputmode="numeric" placeholder="0" aria-label="Nhắc trước bao lâu">
+      <select class="input memory-advance-unit" id="memory-advance-unit" aria-label="Đơn vị nhắc trước">
+        <option value="minutes">phút</option>
+        <option value="hours">giờ</option>
+        <option value="days">ngày</option>
+      </select>
+    </div>
+    <textarea class="input" id="memory-text" placeholder="Write something to remember..." rows="3"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-primary" id="btn-save-memory">Save</button>
+      <button class="btn" id="btn-memory-trash">🗑 Thùng rác</button>
+    </div>
+    <div class="memory-filter-row" id="memory-filter-row" aria-label="Lọc personal memory">
+      <button type="button" class="memory-filter-btn active" data-filter="all">Tất cả</button>
+      <button type="button" class="memory-filter-btn" data-filter="note">Note</button>
+      <button type="button" class="memory-filter-btn" data-filter="plan">Plan</button>
+      <button type="button" class="memory-filter-btn" data-filter="checklist">Checklist</button>
+      <button type="button" class="memory-filter-btn" data-filter="reminder">Reminder</button>
+    </div>
+    <div class="scroll-area" id="memory-list" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<div class="tab-content sidebar-panel" id="tab-focus-today">
+  <div class="card sidebar-panel-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Tập trung hôm nay</div>
+        <div class="card-desc">Xem toàn bộ task đang làm trong ngày và cập nhật nhanh ngay trong sidebar.</div>
+      </div>
+      <div class="sidebar-panel-badge" id="focus-sidebar-badge">0 còn lại</div>
+    </div>
+    <div class="focus-sidebar-input-row">
+      <input type="text" class="input" id="focus-sidebar-input" placeholder="Thêm task mới...">
+      <button class="btn btn-primary btn-sm" id="focus-sidebar-add">+ Thêm</button>
+    </div>
+    <div class="sidebar-panel-summary" id="focus-sidebar-summary"></div>
+    <div class="scroll-area sidebar-panel-scroll" id="focus-sidebar-list"></div>
+  </div>
+</div>
+
+<div class="tab-content sidebar-panel" id="tab-meetings-sidebar">
+  <div class="card sidebar-panel-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Cuộc họp &amp; lịch hẹn</div>
+        <div class="card-desc">Tổng hợp các cuộc họp gần nhất và sắp tới để sidebar mở đúng block bạn cần.</div>
+      </div>
+      <a class="btn btn-sm" href="https://calendar.google.com" target="_blank" rel="noopener noreferrer">Calendar</a>
+    </div>
+    <div class="sidebar-panel-summary" id="meetings-sidebar-summary"></div>
+    <div class="scroll-area sidebar-panel-scroll" id="meetings-sidebar-list"></div>
+  </div>
+</div>
+
+<div class="tab-content sidebar-panel" id="tab-sessions-sidebar">
+  <div class="card sidebar-panel-card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Tiếp tục phiên</div>
+        <div class="card-desc">Xem toàn bộ phiên đã lưu và mở lại đúng bộ tab khi cần quay lại việc đang dở.</div>
+      </div>
+      <div class="sidebar-panel-badge" id="sessions-sidebar-badge">0 phiên</div>
+    </div>
+    <div class="sidebar-panel-summary" id="sessions-sidebar-summary"></div>
+    <div class="scroll-area sidebar-panel-scroll" id="sessions-sidebar-list"></div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-bookmarks">
+  <div id="bm-view-main">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Dấu trang thông minh</div>
+          <div class="card-desc">Nhóm, sắp xếp, ẩn và mở nhanh hơn.</div>
+        </div>
+        <button class="btn btn-sm" id="btn-save-current">Lưu trang<br>này</button>
+      </div>
+      <div class="page-context-preview" id="bookmark-page-context" hidden>
+        <div class="page-context-title" id="bookmark-page-context-title"></div>
+        <div class="page-context-meta" id="bookmark-page-context-meta"></div>
+      </div>
+      <input type="text" class="input bookmark-search" id="bm-search" placeholder="Tìm dấu trang hoặc nhóm">
+      <select class="input" id="bm-target-group" style="margin-top:8px">
+        <option value="">Chọn nhóm để lưu trang này</option>
+      </select>
+      <div class="bookmark-context-status" id="bookmark-context-status"></div>
+    </div>
+
+    <div class="new-group-form">
+      <div class="card-title" style="margin-bottom:4px">Nhóm mới</div>
+      <div class="card-desc">Tạo bộ sưu tập thường hoặc ẩn.</div>
+      <div class="new-group-icon-row">
+        <div class="group-icon-picker" id="group-icon-btn">📁</div>
+        <input type="text" class="input" id="new-group-name" placeholder="Tên nhóm" style="flex:1">
+      </div>
+      <div class="create-group-actions">
+        <label class="checkbox-row" style="margin-bottom:0">
+          <input type="checkbox" id="new-group-hidden">
+          <span class="checkbox-label">Nhóm ẩn</span>
+        </label>
+        <button class="btn btn-primary" id="btn-create-group">Tạo nhóm</button>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+        <label class="checkbox-row" style="margin-bottom:6px">
+          <input type="checkbox" id="auto-delete-on-close">
+          <span class="checkbox-label">Tự xóa dấu trang thông minh khi thoát trình duyệt</span>
+        </label>
+        <button class="btn btn-sm" style="margin-left:auto" id="btn-set-pin">Đặt mã<br>PIN</button>
+        <p class="hint">Phím tắt: Alt+B mở dấu trang ẩn ở giữa màn hình. Nhấn Alt+B lần nữa để đóng các tab đã mở từ phiên ẩn.</p>
+        <div class="bookmark-shortcut-status" id="bookmark-shortcut-status"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" id="bookmark-group-card-title">Danh sách nhóm</div>
+        <button class="btn btn-sm" id="btn-show-hidden">Mở nhóm ẩn</button>
+      </div>
+      <div class="card-desc" id="bookmark-group-card-desc">Kéo thả nhóm và dấu trang để đổi độ ưu tiên.</div>
+      <div class="bookmark-groups scroll-area" id="group-list">
+        <div class="empty-state">
+          <div class="empty-state-icon">🔖</div>
+          Chưa có nhóm nào. Tạo nhóm đầu tiên!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bm-view-detail" style="display:none">
+    <button class="back-btn" id="btn-bm-back">← Quay lại</button>
+    <div class="bookmark-detail-head">
+      <div class="card-title" id="bm-group-title"></div>
+      <div class="bookmark-detail-actions">
+        <button type="button" class="btn btn-sm" id="btn-open-group-detail">Mở tất cả</button>
+        <button type="button" class="btn btn-sm btn-danger-lite" id="btn-delete-group-detail">Xóa nhóm</button>
+      </div>
+    </div>
+    <div class="scroll-area" id="bm-bookmark-list" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-data">
+  <div class="storage-bar"><div class="storage-bar-fill" id="storage-fill"></div></div>
+
+  <div class="clipboard-intro">
+    Offiqa tự động lưu nội dung bạn sao chép trên trang web, kèm liên kết và thời gian để tìm lại nhanh khi cần.
+  </div>
+
+  <div class="clipboard-toolbar">
+    <input type="text" class="input" id="clipboard-search" placeholder="Tìm nội dung, liên kết hoặc tên trang...">
+    <select class="input clipboard-sort" id="clipboard-sort" aria-label="Sắp xếp mục đã sao chép">
+      <option value="newest">Mới nhất</option>
+      <option value="oldest">Cũ nhất</option>
+      <option value="az">A-Z</option>
+      <option value="site">Theo website</option>
+    </select>
+    <button type="button" class="btn clipboard-clear-btn" id="btn-clear-clipboard">Xóa tất cả</button>
+  </div>
+
+  <div class="clipboard-summary" id="clipboard-summary">0 mục đã sao chép</div>
+
+  <div class="clipboard-add-row">
+    <input type="text" class="input" id="clipboard-input" placeholder="Dán hoặc nhập nội dung...">
+    <button class="clipboard-add-btn" id="btn-add-clipboard">+</button>
+  </div>
+
+  <div class="clipboard-list scroll-area" id="clipboard-list">
+    <div class="empty-state">
+      <div class="empty-state-icon">📋</div>
+      Chưa có mục nào được lưu
+    </div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-snippets">
+  <div class="card">
+    <div class="card-title">Snippet gõ nhanh</div>
+    <div class="card-desc">Khi đang nhập trên website, chỉ cần gõ dạng <strong>//n</strong> hoặc <strong>//email</strong> để mở popup gợi ý. Dùng phím mũi tên để chọn và nhấn Enter để chèn nội dung.</div>
+    <div class="snippet-usage-note">
+      Hoạt động trong <strong>input</strong>, <strong>textarea</strong> và nhiều vùng soạn thảo có thể gõ text.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" id="snippet-form-title">Thêm đoạn text mới</div>
+    <div class="snippet-form-grid">
+      <input type="text" class="input" id="snippet-keyword" placeholder="Từ khóa (vd: //n, //email, //thanks)">
+      <textarea class="input" id="snippet-content" rows="4" placeholder="Nội dung sẽ được chèn, vd: Hôm nay là một ngày tuyệt vời."></textarea>
+    </div>
+    <div class="snippet-form-actions">
+      <button class="btn btn-primary" id="btn-save-snippet">Lưu snippet</button>
+      <button class="btn" id="btn-cancel-snippet-edit" hidden>Hủy sửa</button>
+    </div>
+    <div class="hint" id="snippet-form-status">Chỉ cần nhập từ khóa như <strong>//n</strong> và nội dung muốn chèn.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Danh sách snippet</div>
+        <div class="card-desc">Popup gợi ý sẽ lọc theo từ khóa hoặc nội dung.</div>
+      </div>
+      <div class="snippet-count-badge" id="snippet-count-badge">0</div>
+    </div>
+    <input type="text" class="input" id="snippet-search" placeholder="Tìm snippet...">
+    <div class="quick-snippet-list scroll-area" id="snippet-list" style="margin-top:10px">
+      <div class="empty-state">
+        <div class="empty-state-icon">⌨</div>
+        Chưa có snippet nào
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-settings">
+  <div class="settings-group-title">Ngôn ngữ</div>
+  <div class="settings-row">
+    <span class="settings-label">Ngôn ngữ</span>
+    <select class="input" id="lang-select" style="max-width:180px">
+      <option value="vi">Tiếng Việt</option>
+      <option value="en">English</option>
+      <option value="es">Español</option>
+    </select>
+  </div>
+
+  <div class="settings-group-title">Phiên bản</div>
+  <div class="version-info">
+    <span class="version-name">Offiqa</span>
+    <span class="version-num">v1.0.1</span>
+  </div>
+
+  <div class="settings-group-title">Dữ liệu &amp; Bảo mật</div>
+  <div class="privacy-note">
+    Mọi dữ liệu đều được lưu cục bộ trên thiết bị của bạn.<br>
+    Không gửi gì lên máy chủ.
+  </div>
+
+  <div class="settings-group-title" style="margin-top:16px">Backup &amp; Restore</div>
+  <div class="backup-panel">
+    <div class="backup-copy" id="backup-copy">Export your Offiqa data as a JSON file, or restore from a previous backup.</div>
+    <div class="backup-actions">
+      <button type="button" class="btn btn-primary backup-action-btn" id="btn-backup-export">Export backup</button>
+      <button type="button" class="btn backup-action-btn" id="btn-backup-restore">Restore backup</button>
+    </div>
+    <input type="file" id="backup-restore-input" accept="application/json,.json" hidden>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:16px">Nội dung sao chép</div>
+  <div class="settings-row">
+    <span class="settings-label">Tự động lưu nội dung sao chép</span>
+    <label class="checkbox-row" style="margin-bottom:0">
+      <input type="checkbox" id="enable-clipboard" checked>
+      <span class="checkbox-label">Bật tự động lưu</span>
+    </label>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:16px">Audio / Video</div>
+  <div class="settings-row">
+    <span class="settings-label">Tự động phát audio/video trên website</span>
+    <label class="checkbox-row" style="margin-bottom:0">
+      <input type="checkbox" id="enable-media-autoplay" checked>
+      <span class="checkbox-label">Cho phép tự động phát</span>
+    </label>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:16px">Gõ nhanh</div>
+  <div class="settings-row">
+    <span class="settings-label">Bật popup snippet khi gõ // trong form</span>
+    <label class="checkbox-row" style="margin-bottom:0">
+      <input type="checkbox" id="enable-quick-snippets" checked>
+      <span class="checkbox-label">Bật gợi ý gõ nhanh</span>
+    </label>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:16px">Offiqa Home</div>
+  <div class="settings-row">
+    <span class="settings-label">Trang tab mới</span>
+    <label class="checkbox-row" style="margin-bottom:0">
+      <input type="checkbox" id="enable-home" checked>
+      <span class="checkbox-label">Bật Offiqa Home</span>
+    </label>
+  </div>
+
+  <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
+    <button class="btn" style="color:#ef4444;border-color:#fca5a5;width:100%;font-size:12.5px" id="btn-reset-all">
+      🗑 Xóa toàn bộ dữ liệu Offiqa
+    </button>
+  </div>
+</div>
+
+<div class="pin-modal hidden" id="pin-modal">
+  <div class="pin-modal-inner">
+    <div class="card-title" id="pin-modal-title">Đặt mã PIN</div>
+    <div class="card-desc" id="pin-modal-desc">Nhập mã PIN 4 chữ số để bảo vệ nhóm ẩn</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+      <div class="pin-dot" id="pd4"></div>
+    </div>
+    <div class="pin-keypad">
+      <button class="pin-key" data-key="1">1</button>
+      <button class="pin-key" data-key="2">2</button>
+      <button class="pin-key" data-key="3">3</button>
+      <button class="pin-key" data-key="4">4</button>
+      <button class="pin-key" data-key="5">5</button>
+      <button class="pin-key" data-key="6">6</button>
+      <button class="pin-key" data-key="7">7</button>
+      <button class="pin-key" data-key="8">8</button>
+      <button class="pin-key" data-key="9">9</button>
+      <button class="pin-key" data-key="C" style="font-size:12px">Xóa</button>
+      <button class="pin-key" data-key="0">0</button>
+      <button class="pin-key" data-key="X" style="font-size:12px;color:#ef4444">✕</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../i18n/en.js"></script>
+<script src="../i18n/es.js"></script>
+<script src="../i18n/vi.js"></script>
+<script src="../shared/dexie.min.js"></script>
+<script src="../shared/idb.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,985 @@
+/* Focus Timer */
+.focus-timer-card {
+  padding: 16px 18px;
+  --timer-accent: var(--green);
+  --timer-accent-soft: rgba(22, 163, 74, 0.12);
+  --timer-accent-shadow: rgba(22, 163, 74, 0.18);
+  --timer-surface: #f8fbf8;
+}
+
+.focus-timer-card.is-near-end {
+  --timer-accent: #f59e0b;
+  --timer-accent-soft: rgba(245, 158, 11, 0.14);
+  --timer-accent-shadow: rgba(245, 158, 11, 0.16);
+  --timer-surface: #fffaf0;
+}
+
+.focus-timer-card.is-break {
+  --timer-accent: #60a5fa;
+  --timer-accent-soft: rgba(96, 165, 250, 0.16);
+  --timer-accent-shadow: rgba(96, 165, 250, 0.16);
+  --timer-surface: #f4f8ff;
+}
+
+.focus-timer-card.is-paused {
+  --timer-accent: #6b7280;
+  --timer-accent-soft: rgba(107, 114, 128, 0.12);
+  --timer-accent-shadow: rgba(107, 114, 128, 0.14);
+  --timer-surface: #f8fafc;
+}
+
+.focus-timer-card.is-complete {
+  --timer-accent: #16a34a;
+  --timer-accent-soft: rgba(22, 163, 74, 0.12);
+  --timer-accent-shadow: rgba(22, 163, 74, 0.16);
+  --timer-surface: #f7fcf8;
+}
+
+.focus-timer-header {
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.focus-timer-context-row {
+  margin-bottom: 12px;
+}
+
+.focus-context-field {
+  position: relative;
+}
+
+.focus-context-caption {
+  margin: 0 0 6px 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #8793a2;
+}
+
+.focus-context-input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  outline: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--timer-surface);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.focus-context-input:focus {
+  border-color: var(--timer-accent);
+  box-shadow: 0 0 0 4px var(--timer-accent-soft);
+  background: white;
+}
+
+.focus-task-suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 8;
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid rgba(216, 222, 232, 0.95);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1);
+}
+
+.focus-task-suggestions[hidden],
+.timer-custom-wrap[hidden],
+.timer-actions-secondary[hidden],
+.timer-post-session[hidden],
+.timer-note-editor[hidden],
+.smart-reminder-panel[hidden],
+.smart-reminder-card[hidden],
+.timer-post-reminder[hidden] {
+  display: none !important;
+}
+
+.focus-task-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.focus-task-suggestion:hover {
+  background: #eff6ff;
+  transform: translateY(-1px);
+}
+
+.focus-task-suggestion strong {
+  font-weight: 600;
+}
+
+.focus-task-suggestion-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.timer-preset-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.smart-reminder-entry {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.smart-reminder-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(216, 222, 232, 0.9);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(248, 251, 248, 0.92) 0%, rgba(255, 255, 255, 0.98) 100%);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.smart-reminder-toggle:hover {
+  border-color: #ced7e2;
+  background: white;
+  transform: translateY(-1px);
+}
+
+.smart-reminder-toggle-copy {
+  display: grid;
+  gap: 3px;
+  text-align: left;
+}
+
+.smart-reminder-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #304052;
+}
+
+.smart-reminder-summary {
+  font-size: 11.5px;
+  color: #7b8797;
+}
+
+.smart-reminder-toggle-icon {
+  font-size: 13px;
+  color: #7b8797;
+  transition: transform 0.15s;
+}
+
+.smart-reminder-toggle[aria-expanded="true"] .smart-reminder-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.smart-reminder-panel {
+  display: grid;
+  gap: 8px;
+  padding: 11px 12px;
+  border: 1px solid rgba(216, 222, 232, 0.86);
+  border-radius: 16px;
+  background: rgba(248, 250, 252, 0.88);
+}
+
+.smart-reminder-rules {
+  display: grid;
+  gap: 8px;
+}
+
+.smart-reminder-rule {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.smart-reminder-rule-main,
+.smart-reminder-work-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.smart-reminder-rule-main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.smart-reminder-rule-main input,
+.smart-reminder-work-toggle input {
+  margin: 0;
+  accent-color: var(--timer-accent);
+}
+
+.smart-reminder-select,
+.smart-reminder-time {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #d8dee8;
+  border-radius: 10px;
+  background: white;
+  font-family: inherit;
+  font-size: 12px;
+  color: #49576a;
+}
+
+.smart-reminder-select.is-hidden {
+  display: none !important;
+}
+
+.smart-reminder-minute-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #d8dee8;
+  border-radius: 10px;
+  background: white;
+}
+
+.smart-reminder-minute-input {
+  width: 58px;
+  min-height: 30px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  color: #49576a;
+  text-align: right;
+  outline: none;
+}
+
+.smart-reminder-minute-input::-webkit-outer-spin-button,
+.smart-reminder-minute-input::-webkit-inner-spin-button {
+  margin: 0;
+}
+
+.smart-reminder-minute-input:disabled,
+.smart-reminder-minute-suffix {
+  color: #6b7785;
+}
+
+.smart-reminder-minute-suffix {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.smart-reminder-rule-actions,
+.smart-reminder-editor-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.smart-reminder-icon-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #d8dee8;
+  border-radius: 10px;
+  background: white;
+  color: #5f6f82;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, transform 0.15s;
+}
+
+.smart-reminder-icon-btn:hover {
+  border-color: #bfc9d6;
+  color: #25364b;
+  transform: translateY(-1px);
+}
+
+.smart-reminder-icon-btn.is-danger:hover {
+  border-color: #f1b9b9;
+  color: #b42318;
+}
+
+.smart-reminder-add-btn,
+.smart-reminder-text-btn {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid #d8dee8;
+  border-radius: 10px;
+  background: white;
+  color: #415165;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.smart-reminder-add-btn {
+  justify-self: start;
+}
+
+.smart-reminder-add-btn:hover,
+.smart-reminder-text-btn:hover {
+  border-color: #bfc9d6;
+  background: #f8fafc;
+}
+
+.smart-reminder-text-btn.is-primary {
+  border-color: var(--timer-accent);
+  background: var(--timer-accent);
+  color: white;
+}
+
+.smart-reminder-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.smart-reminder-editor[hidden] {
+  display: none;
+}
+
+.smart-reminder-name-input {
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #d8dee8;
+  border-radius: 10px;
+  background: white;
+  font-family: inherit;
+  font-size: 12px;
+  color: #334155;
+}
+
+.smart-reminder-name-input:focus,
+.smart-reminder-minute-input:focus {
+  outline: none;
+}
+
+.smart-reminder-empty {
+  padding: 4px 0;
+  color: #7b8797;
+  font-size: 12px;
+}
+
+.smart-reminder-work-hours {
+  display: grid;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.smart-reminder-time-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 24px;
+}
+
+.smart-reminder-time {
+  width: 92px;
+}
+
+.smart-reminder-time-sep {
+  color: #8a97a6;
+  font-size: 12px;
+}
+
+.timer-preset-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+}
+
+.timer-preset-side {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: end;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.timer-preset-btn {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #d8dee8;
+  border-radius: 999px;
+  background: white;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.timer-preset-btn:hover {
+  border-color: #c3ccd8;
+  color: var(--text);
+}
+
+.timer-preset-btn.active {
+  border-color: transparent;
+  background: var(--timer-accent);
+  color: white;
+  box-shadow: 0 10px 22px var(--timer-accent-shadow);
+}
+
+.timer-preset-btn-custom {
+  padding: 0 12px;
+  background: #f8fafc;
+  color: #647284;
+  border-color: #dce3eb;
+}
+
+.timer-preset-btn-custom.active {
+  background: var(--timer-accent-soft);
+  color: var(--timer-accent);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.timer-custom-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  min-height: 34px;
+  border: 1px solid #d8dee8;
+  border-radius: 999px;
+  background: white;
+  flex-shrink: 0;
+}
+
+.timer-custom-input {
+  width: 56px;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+}
+
+.timer-custom-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.timer-autobreak-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--timer-surface);
+  border: 1px solid #d8dee8;
+  color: #657182;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.timer-autobreak-toggle input {
+  margin: 0;
+  accent-color: var(--timer-accent);
+}
+
+.focus-timer-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.focus-timer-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.timer-ring {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.timer-ring svg {
+  width: 96px;
+  height: 96px;
+  transform: rotate(-90deg);
+}
+
+.timer-ring-track {
+  fill: none;
+  stroke: #e7ebf0;
+  stroke-width: 4;
+}
+
+.timer-ring-fill {
+  fill: none;
+  stroke: var(--timer-accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 188;
+  stroke-dashoffset: 188;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  color: var(--text);
+}
+
+.timer-status-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 20px;
+}
+
+.timer-state-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--timer-accent-soft);
+  color: var(--timer-accent);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.timer-context-label {
+  font-size: 13px;
+  color: #253244;
+  font-weight: 600;
+}
+
+.timer-supporting-text {
+  min-height: 18px;
+  font-size: 12.5px;
+  color: #768394;
+  font-weight: 500;
+}
+
+.timer-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timer-mode-btns {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  margin-left: auto;
+  border-radius: 999px;
+  background: #f3f5f8;
+  flex-shrink: 0;
+}
+
+.timer-mode-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 16px;
+  min-width: 108px;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  transition: all 0.15s;
+}
+
+.timer-mode-btn.active {
+  background: var(--green);
+  color: white;
+  box-shadow: 0 8px 18px rgba(22, 163, 74, 0.18);
+}
+
+.btn-timer-main {
+  flex: 1;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--timer-accent) 82%, white) 0%, var(--timer-accent) 100%);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  box-shadow: 0 10px 20px var(--timer-accent-shadow);
+}
+
+.btn-timer-main:hover {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--timer-accent) 72%, white) 0%, color-mix(in srgb, var(--timer-accent) 88%, black 4%) 100%);
+  transform: translateY(-1px);
+}
+
+.btn-timer-main.is-muted {
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+  color: var(--text);
+  box-shadow: none;
+  border: 1px solid #d8dee8;
+}
+
+.btn-timer-reset {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid #e6ebf1;
+  background: #fcfdff;
+  cursor: pointer;
+  font-size: 17px;
+  color: #8a97a6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-timer-reset:hover {
+  background: #f8fafc;
+  border-color: #dfe6ee;
+  color: #6f7d8c;
+}
+
+.timer-actions-secondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-timer-inline {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid #d8dee8;
+  background: white;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.btn-timer-inline:hover {
+  transform: translateY(-1px);
+  border-color: #c3ccd8;
+  background: #f8fafc;
+}
+
+.btn-timer-inline.is-success {
+  border-color: transparent;
+  background: var(--timer-accent-soft);
+  color: var(--timer-accent);
+}
+
+.timer-post-session {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--timer-surface);
+  border: 1px solid rgba(216, 222, 232, 0.8);
+}
+
+.timer-post-reminder {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #667385;
+}
+
+.timer-post-reminder-text {
+  font-weight: 600;
+}
+
+.timer-post-reminder-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.smart-reminder-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(216, 222, 232, 0.9);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.98) 0%, rgba(255, 255, 255, 0.98) 100%);
+}
+
+.smart-reminder-card-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.smart-reminder-card-kicker {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6c7a8b;
+}
+
+.smart-reminder-card-message {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #233243;
+  font-weight: 600;
+}
+
+.smart-reminder-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.smart-reminder-suppress {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.smart-reminder-suppress input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--timer-accent);
+}
+
+.timer-post-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.timer-note-editor {
+  display: grid;
+  gap: 8px;
+}
+
+.timer-note-input {
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1.5px solid #d8dee8;
+  border-radius: 12px;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: white;
+}
+
+.timer-note-input:focus {
+  border-color: var(--timer-accent);
+  box-shadow: 0 0 0 4px var(--timer-accent-soft);
+}
+
+.timer-note-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.timer-sessions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  font-size: 12px;
+  color: #97a0ad;
+}
+
+.timer-session-count {
+  margin-right: 4px;
+  color: #5d6978;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.session-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(195, 204, 216, 0.8);
+  background: rgba(243, 245, 248, 0.9);
+  opacity: 0.72;
+}
+
+.session-dot.done {
+  background: var(--timer-accent);
+  border-color: var(--timer-accent);
+  opacity: 0.85;
+}
+
+@media (max-width: 900px) {
+  .focus-timer-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .timer-mode-btns {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .timer-mode-btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .timer-autobreak-toggle {
+    width: auto;
+  }
+
+  .timer-preset-row {
+    grid-template-columns: 1fr;
+  }
+
+  .timer-preset-side {
+    justify-self: start;
+    gap: 6px;
+  }
+
+  .timer-preset-group {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 600px) {
+  .focus-timer-body {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .timer-ring {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto;
+  }
+
+  .timer-ring svg {
+    width: 88px;
+    height: 88px;
+  }
+
+  .focus-timer-main {
+    width: 100%;
+  }
+
+  .timer-controls {
+    flex-wrap: wrap;
+  }
+
+  .btn-timer-reset {
+    width: 100%;
+    height: 40px;
+  }
+
+  .timer-post-actions,
+  .timer-note-actions,
+  .timer-actions-secondary,
+  .smart-reminder-card-actions,
+  .timer-post-reminder-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .smart-reminder-rule {
+    grid-template-columns: 1fr;
+  }
+
+  .smart-reminder-rule-actions {
+    justify-content: flex-start;
+  }
+
+  .smart-reminder-editor {
+    grid-template-columns: 1fr;
+  }
+
+  .smart-reminder-editor-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .smart-reminder-time-range {
+    margin-left: 0;
+    flex-wrap: wrap;
+  }
+}

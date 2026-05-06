@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offiqa Reminder</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon32.png">
+  <link rel="stylesheet" href="reminder-popup.css">
+</head>
+<body>
+  <main class="reminder-shell">
+    <button type="button" class="reminder-close" id="reminder-close" aria-label="Close">×</button>
+    <div class="reminder-kicker">Offiqa</div>
+    <h1 class="reminder-title" id="reminder-title">Reminder</h1>
+    <p class="reminder-message" id="reminder-message">Checking reminders...</p>
+    <div class="reminder-meta" id="reminder-meta">This popup will close automatically when you are done.</div>
+    <div class="reminder-actions">
+      <button type="button" class="btn btn-primary" id="reminder-done">Done</button>
+      <label class="reminder-suppress">
+        <input type="checkbox" id="reminder-suppress-today">
+        <span id="reminder-suppress-label">Do not show again today</span>
+      </label>
+    </div>
+  </main>
+  <script src="../i18n/en.js"></script>
+<script src="../i18n/es.js"></script>
+<script src="../i18n/vi.js"></script>
+<script src="../shared/dexie.min.js"></script>
+<script src="../shared/idb.js"></script>
+<script src="reminder-popup.js"></script>
+</body>
+</html>

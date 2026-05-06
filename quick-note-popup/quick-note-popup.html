@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offiqa Quick Note</title>
+  <link rel="stylesheet" href="quick-note-popup.css">
+</head>
+<body>
+  <main class="quick-note-shell">
+    <header class="quick-note-header">
+      <div>
+        <div class="quick-note-kicker">Offiqa</div>
+        <h1>Ghi nhanh</h1>
+      </div>
+      <button type="button" class="icon-btn" id="quick-note-close" aria-label="Đóng">&times;</button>
+    </header>
+
+    <section class="type-switch" id="quick-note-type" aria-label="Loại ghi nhớ">
+      <button type="button" class="type-pill active" data-type="note">📝 Ghi chú</button>
+      <button type="button" class="type-pill" data-type="reminder">⏰ Nhắc nhở</button>
+      <button type="button" class="type-pill" data-type="checklist">☑️ Danh sách</button>
+      <button type="button" class="type-pill" data-type="plan">🗓 Kế hoạch</button>
+    </section>
+
+    <section class="composer">
+      <textarea id="quick-note-text" rows="7" placeholder="Ghi nhanh điều cần nhớ..."></textarea>
+
+      <div class="schedule-row" id="quick-note-schedule" hidden>
+        <input type="date" id="quick-note-due" aria-label="Ngày">
+        <input type="time" id="quick-note-time" aria-label="Giờ">
+      </div>
+
+      <div class="advance-row" id="quick-note-advance" hidden>
+        <span>Nhắc trước</span>
+        <input type="number" id="quick-note-advance-value" min="0" max="999" step="1" inputmode="numeric" placeholder="0" aria-label="Nhắc trước bao lâu">
+        <select id="quick-note-advance-unit" aria-label="Đơn vị nhắc trước">
+          <option value="minutes">phút</option>
+          <option value="hours">giờ</option>
+          <option value="days">ngày</option>
+        </select>
+      </div>
+
+      <label class="source-row" id="quick-note-source-row">
+        <input type="checkbox" id="quick-note-include-source" checked>
+        <span>
+          <strong>Lưu kèm trang hiện tại</strong>
+          <small id="quick-note-source"></small>
+        </span>
+      </label>
+
+      <div class="actions">
+        <button type="button" class="save-btn" id="quick-note-save">Lưu</button>
+        <span class="status" id="quick-note-status"></span>
+      </div>
+    </section>
+
+    <section class="recent" id="quick-note-recent" hidden>
+      <div class="recent-title">Vừa lưu</div>
+      <div class="recent-list" id="quick-note-recent-list"></div>
+    </section>
+  </main>
+
+  <script src="../shared/dexie.min.js"></script>
+  <script src="../shared/idb.js"></script>
+  <script src="quick-note-popup.js"></script>
+</body>
+</html>

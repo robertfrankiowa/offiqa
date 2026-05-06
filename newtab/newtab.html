@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offiqa Home</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../icons/icon32.png">
+  <link rel="stylesheet" href="newtab.css">
+  <link rel="stylesheet" href="../customize/customize.css">
+</head>
+<body class="ofq-layout-pending">
+
+<!-- Timer Top Progress Bar -->
+<div id="timer-top-bar" hidden></div>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <img class="topbar-logo" src="../icons/icon32.png" alt="" width="28" height="28">
+    <span class="topbar-brand">Offiqa</span>
+    <span class="topbar-tag">Home</span>
+  </div>
+  <div class="topbar-center">
+    <div class="bookmark-shelf" id="bookmark-shelf">
+      <span class="bookmark-shelf-label">Nhóm</span>
+      <div class="bookmark-shelf-track" id="bookmark-shelf-track"></div>
+      <div class="bookmark-shelf-more" id="bookmark-shelf-more" hidden>
+        <button
+          type="button"
+          class="bookmark-shelf-arrow"
+          id="bookmark-shelf-overflow-btn"
+          aria-label="Xem thêm nhóm"
+          aria-expanded="false"
+        >></button>
+        <div class="bookmark-shelf-flyout" id="bookmark-shelf-flyout" hidden></div>
+      </div>
+      <button type="button" class="bookmark-shelf-full" id="bookmark-shelf-full-btn" hidden>Xem đầy đủ</button>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      <span>Đang hoạt động</span>
+    </div>
+    <button class="topbar-btn search-toggle-btn" id="btn-toggle-search" title="Ẩn/hiện tìm kiếm">🔍 Tìm kiếm</button>
+    <button class="topbar-btn" id="btn-open-offiqa">Mở Offiqa</button>
+    <div class="topbar-menu-wrapper" style="position: relative; display: inline-block;">
+      <button class="topbar-menu" id="topbar-menu-btn">···</button>
+      <div class="topbar-menu-dropdown hidden" id="topbar-menu-dropdown">
+        <button class="topbar-menu-item" id="btn-toggle-search-menu">Hide search</button>
+        <button class="topbar-menu-item" id="btn-customize-newtab">Customize New Tab</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Clock -->
+  <div class="hero">
+    <div class="clock">
+      <span id="clock-h">00</span>:<span id="clock-m">00</span><span class="clock-seconds" id="clock-s">00</span>
+    </div>
+    <div class="date-label" id="date-label"></div>
+  </div>
+
+  <!-- Morning Brief -->
+  <div id="morning-brief" hidden></div>
+
+  <!-- Search Bar -->
+  <div class="search-wrap" id="search-wrap">
+    <div class="search-bar">
+      <button class="search-engine-btn" id="engine-btn">
+        <img id="engine-favicon" src="../icons/icon16.png" alt="" width="16" height="16" style="border-radius:2px">
+        <span id="engine-name">Google</span>
+        <span style="color:#9ca3af;font-size:10px">▼</span>
+      </button>
+      <input type="text" class="search-input" id="search-input" placeholder="Tìm kiếm hoặc nhập URL..." autocomplete="off">
+      <button class="search-icon-btn" id="search-btn">🔍</button>
+    </div>
+    <div class="engine-dropdown" id="engine-dropdown">
+      <div class="engine-option" data-engine="google" data-url="https://www.google.com/search?q=" data-icon="https://www.google.com/favicon.ico">
+        <img src="https://www.google.com/favicon.ico" width="16" height="16">Google
+      </div>
+      <div class="engine-option" data-engine="bing" data-url="https://www.bing.com/search?q=" data-icon="https://www.bing.com/favicon.ico">
+        <img src="https://www.bing.com/favicon.ico" width="16" height="16">Bing
+      </div>
+      <div class="engine-option" data-engine="duckduckgo" data-url="https://duckduckgo.com/?q=" data-icon="https://duckduckgo.com/favicon.ico">
+        <img src="https://duckduckgo.com/favicon.ico" width="16" height="16">DuckDuckGo
+      </div>
+      <div class="engine-option" data-engine="brave" data-url="https://search.brave.com/search?q=" data-icon="https://brave.com/favicon.ico">
+        <img src="https://brave.com/favicon.ico" width="16" height="16">Brave
+      </div>
+    </div>
+  </div>
+
+  <!-- App Dock -->
+  <!-- Widget Grid -->
+  <div class="grid">
+    <!-- Meeting -->
+    <div class="card meeting-card card-with-footer" id="tab-meetings">
+      <div class="card-header">
+        <span class="card-title">Cuộc họp &amp; lịch hẹn</span>
+        <button class="btn-add-meeting" id="btn-add-meeting" title="Thêm cuộc họp hoặc lịch hẹn">+ Thêm</button>
+      </div>
+      <!-- Inline add form -->
+      <div class="meeting-form" id="meeting-form" hidden>
+        <div class="meeting-form-row">
+          <select class="meeting-input meeting-kind-select" id="meeting-kind-input">
+            <option value="meeting">Họp</option>
+            <option value="appointment">Hẹn</option>
+          </select>
+          <input type="date" class="meeting-input meeting-date" id="meeting-date-input">
+          <input type="time" class="meeting-input meeting-time" id="meeting-time-input">
+        </div>
+        <input type="text" class="meeting-input" id="meeting-title-input" placeholder="Tên cuộc họp hoặc lịch hẹn...">
+        <div class="meeting-form-row meeting-form-row-compact" id="meeting-link-row">
+          <input type="url" class="meeting-input" id="meeting-link-input" placeholder="Link họp (Meet, Zoom...) — tùy chọn">
+        </div>
+        <div class="meeting-form-hint" id="meeting-form-hint">Lưu xong rồi hoàn thiện agenda, tài liệu hoặc ghi chú trong các tab Trước / Trong / Sau.</div>
+        <div class="meeting-form-actions">
+          <button class="btn-meeting-save" id="meeting-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="meeting-cancel-btn">Hủy</button>
+        </div>
+      </div>
+      <!-- Meeting list -->
+      <div class="card-footer-content" id="meeting-list"></div>
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="meeting-open-sidebar">Xem tất cả →</a>
+      </div>
+    </div>
+
+    <!-- Tasks -->
+    <div class="card focus-card card-with-footer">
+      <div class="card-header">
+        <span class="card-title">Tập trung hôm nay</span>
+        <span class="card-badge" id="task-remaining-badge">0 còn lại</span>
+      </div>
+      <div class="task-input-row">
+        <input type="text" class="task-input" id="task-input" placeholder="Thêm nhiệm vụ... (Enter)">
+        <button class="btn-add-task" id="btn-add-task">+</button>
+      </div>
+      <div class="card-footer-content" id="task-list"></div>
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="task-open-sidebar">Xem tất cả →</a>
+      </div>
+    </div>
+
+    <!-- Quick Notes -->
+    <div class="card note-card card-with-footer">
+      <div class="card-header note-card-header">
+        <span class="card-title">Ghi chú nhanh</span>
+        <button type="button" class="btn-add-meeting note-save-btn-inline" id="note-save-btn">+ Lưu</button>
+      </div>
+      <div class="note-type-row" id="note-type-row">
+        <button class="note-type-pill active" data-type="note">📝 Note</button>
+        <button class="note-type-pill" data-type="reminder">⏰ Reminder</button>
+        <button class="note-type-pill" data-type="checklist">☑️ Checklist</button>
+        <button class="note-type-pill" data-type="plan">🗓 Plan</button>
+      </div>
+      <div class="note-schedule-row" id="note-schedule-row" hidden>
+        <input type="date" class="note-due-input" id="note-due-input" aria-label="Ngày nhắc hoặc kế hoạch">
+        <input type="time" class="note-time-input" id="note-time-input" aria-label="Giờ nhắc hoặc kế hoạch">
+        <div class="note-advance-row" id="note-advance-row">
+          <span class="note-advance-label">Nhắc trước</span>
+          <input type="number" class="note-advance-input" id="note-advance-input" min="0" max="999" step="1" inputmode="numeric" placeholder="0" aria-label="Nhắc trước bao lâu">
+          <select class="note-advance-unit" id="note-advance-unit" aria-label="Đơn vị nhắc trước">
+            <option value="minutes">phút</option>
+            <option value="hours">giờ</option>
+            <option value="days">ngày</option>
+          </select>
+        </div>
+      </div>
+      <textarea class="note-textarea" id="quick-note" placeholder="Ghi lại điều cần nhớ...&#10;Chỉ bạn thấy, lưu cục bộ."></textarea>
+      <div class="home-memory-list-header" id="home-memory-list-header" hidden>
+        <div class="home-memory-list-heading">
+          <span class="home-memory-list-label" id="home-memory-list-label">Đúng loại này</span>
+          <span class="home-memory-list-count" id="home-memory-list-count"></span>
+        </div>
+        <div class="home-memory-scope-switch" id="home-memory-scope-switch">
+          <button type="button" class="home-memory-scope-btn active" data-scope="match">Đúng loại này</button>
+          <button type="button" class="home-memory-scope-btn" data-scope="recent">Gần đây</button>
+          <button type="button" class="home-memory-scope-btn" data-scope="all">Tất cả</button>
+        </div>
+      </div>
+      <div class="home-memory-list" id="home-memory-list" hidden></div>
+      <div class="note-footer">
+        <div class="note-meta">
+          <span id="note-content-state">Chưa nhập nội dung</span>
+          <span class="note-save-state" id="note-save-state">Đã lưu</span>
+        </div>
+        <div class="note-actions">
+          <a class="note-link" href="#" id="note-open-memory">Xem tất cả →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session (prioritized above Focus Timer) -->
+    <div class="card session-resume-card card-with-footer" id="tab-sessions">
+      <div class="card-header">
+        <span class="card-title">Tiếp tục phiên</span>
+        <button
+          type="button"
+          class="card-badge session-save-badge"
+          id="btn-save-session"
+          title="Lưu tab hiện tại thành phiên mới"
+        >+ Phiên mới</button>
+      </div>
+      <div class="card-footer-content" id="session-list">
+        <div class="session-onboarding" id="session-onboarding">
+          <div class="onboarding-example">
+            <span class="onboarding-icon">💡</span>
+            <div class="onboarding-text">
+              <strong>Mở lại toàn bộ tabs của deal ABC từ hôm qua?</strong>
+              <span>Lưu phiên ngay để khôi phục chỉ 1 click.</span>
+            </div>
+          </div>
+          <button type="button" class="btn-onboarding-save" id="btn-onboarding-save">
+            💾 Lưu tab hiện tại thành phiên đầu tiên
+          </button>
+        </div>
+      </div>
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="session-open-sidebar">Xem tất cả →</a>
+      </div>
+    </div>
+
+    <!-- Focus Timer -->
+    <div class="card focus-timer-card" id="focus-timer-card">
+      <div class="card-header focus-timer-header">
+        <span class="card-title">Đồng hồ tập trung</span>
+        <div class="timer-mode-btns">
+          <button class="timer-mode-btn active" data-mode="countdown">Đếm ngược</button>
+          <button class="timer-mode-btn" data-mode="stopwatch">Bấm giờ</button>
+        </div>
+      </div>
+      <div class="focus-timer-context-row">
+        <div class="focus-context-field">
+          <div class="focus-context-caption">Mục tiêu phiên</div>
+          <input
+            type="text"
+            class="focus-context-input"
+            id="focus-context-input"
+            placeholder="Phiên này làm gì?"
+            autocomplete="off"
+          >
+          <div class="focus-task-suggestions" id="focus-task-suggestions" hidden></div>
+        </div>
+      </div>
+      <div class="timer-preset-row" id="timer-preset-row">
+        <div class="timer-preset-group">
+          <button type="button" class="timer-preset-btn active" data-preset="10">10'</button>
+          <button type="button" class="timer-preset-btn" data-preset="15">15'</button>
+          <button type="button" class="timer-preset-btn" data-preset="25">25'</button>
+          <button type="button" class="timer-preset-btn" data-preset="50">50'</button>
+        </div>
+        <div class="timer-preset-side">
+          <button type="button" class="timer-preset-btn timer-preset-btn-custom" data-preset="custom">Tùy chỉnh</button>
+          <div class="timer-custom-wrap" id="timer-custom-wrap" hidden>
+            <input type="number" class="timer-custom-input" id="timer-custom-input" min="1" max="180" value="30">
+            <span class="timer-custom-label">phút</span>
+          </div>
+          <label class="timer-autobreak-toggle" for="timer-autobreak-toggle">
+            <input type="checkbox" id="timer-autobreak-toggle" checked>
+            <span>Tự nghỉ</span>
+          </label>
+        </div>
+      </div>
+      <div class="smart-reminder-entry">
+        <button type="button" class="smart-reminder-toggle" id="smart-reminder-toggle" aria-expanded="false">
+          <span class="smart-reminder-toggle-copy">
+            <span class="smart-reminder-label">Nhắc nhở thông minh</span>
+            <span class="smart-reminder-summary" id="smart-reminder-summary">2 nhắc nhở đang bật</span>
+          </span>
+          <span class="smart-reminder-toggle-icon" id="smart-reminder-toggle-icon">▾</span>
+        </button>
+        <div class="smart-reminder-panel" id="smart-reminder-panel" hidden>
+          <div class="smart-reminder-rules" id="smart-reminder-rules"></div>
+          <form class="smart-reminder-editor" id="smart-reminder-editor" hidden>
+            <input
+              type="text"
+              class="smart-reminder-name-input"
+              id="smart-reminder-name-input"
+              maxlength="40"
+              placeholder="Tên nhắc nhở"
+            >
+            <label class="smart-reminder-minute-wrap">
+              <input
+                type="number"
+                class="smart-reminder-minute-input"
+                id="smart-reminder-editor-interval"
+                min="1"
+                max="240"
+                step="1"
+                inputmode="numeric"
+              >
+              <span class="smart-reminder-minute-suffix">phút</span>
+            </label>
+            <div class="smart-reminder-editor-actions">
+              <button type="submit" class="smart-reminder-text-btn is-primary" id="smart-reminder-save">Lưu</button>
+              <button type="button" class="smart-reminder-text-btn" id="smart-reminder-cancel">Hủy</button>
+            </div>
+          </form>
+          <button type="button" class="smart-reminder-add-btn" id="smart-reminder-add">+ Thêm nhắc nhở</button>
+          <div class="smart-reminder-work-hours">
+            <label class="smart-reminder-work-toggle">
+              <input type="checkbox" id="reminder-work-hours-only">
+              <span>Chỉ nhắc trong giờ làm việc</span>
+            </label>
+            <div class="smart-reminder-time-range">
+              <input type="time" class="smart-reminder-time" id="reminder-work-hours-start" value="08:30">
+              <span class="smart-reminder-time-sep">-</span>
+              <input type="time" class="smart-reminder-time" id="reminder-work-hours-end" value="17:30">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="focus-timer-body">
+        <div class="timer-ring">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="timer-ring-track" cx="40" cy="40" r="30"></circle>
+            <circle class="timer-ring-fill" id="timer-ring" cx="40" cy="40" r="30"></circle>
+          </svg>
+          <div class="timer-ring-text" id="timer-display">25:00</div>
+        </div>
+        <div class="focus-timer-main">
+          <div class="timer-status-line">
+            <span class="timer-state-pill" id="timer-state-pill" hidden></span>
+            <span class="timer-context-label" id="timer-context-label" hidden></span>
+          </div>
+          <div class="timer-supporting-text" id="timer-supporting-text"></div>
+          <div class="timer-controls">
+            <button class="btn-timer-main" id="btn-timer-primary">Bắt đầu</button>
+            <button class="btn-timer-reset" id="btn-timer-reset" title="Đặt lại phiên" aria-label="Đặt lại phiên">↺</button>
+          </div>
+          <div class="timer-actions-secondary" id="timer-actions-secondary" hidden>
+            <button class="btn-timer-inline" id="btn-timer-secondary" hidden></button>
+            <button class="btn-timer-inline" id="btn-timer-tertiary" hidden></button>
+          </div>
+          <div class="timer-post-session" id="timer-post-session" hidden>
+            <div class="timer-post-actions">
+              <button class="btn-timer-inline is-success" id="btn-timer-complete-task">Đánh dấu xong</button>
+              <button class="btn-timer-inline" id="btn-timer-open-note">Ghi chú</button>
+              <button class="btn-timer-inline" id="btn-timer-start-break">Bắt đầu nghỉ 5 phút</button>
+            </div>
+            <div class="timer-post-reminder" id="timer-post-reminder" hidden></div>
+            <div class="timer-note-editor" id="timer-note-editor" hidden>
+              <textarea class="timer-note-input" id="timer-note-input" placeholder="Ghi nhanh điều vừa xong..."></textarea>
+              <div class="timer-note-actions">
+                <button class="btn-timer-inline is-success" id="btn-timer-save-note">Lưu ghi chú</button>
+                <button class="btn-timer-inline" id="btn-timer-cancel-note">Đóng</button>
+              </div>
+            </div>
+          </div>
+          <div class="smart-reminder-card" id="smart-reminder-card" hidden>
+            <div class="smart-reminder-card-copy">
+              <span class="smart-reminder-card-kicker" id="smart-reminder-card-kicker">Nhắc nhở</span>
+              <span class="smart-reminder-card-message" id="smart-reminder-card-message"></span>
+            </div>
+            <div class="smart-reminder-card-actions">
+              <button type="button" class="btn-timer-inline is-success" id="smart-reminder-done">Đã làm</button>
+              <label class="smart-reminder-suppress">
+                <input type="checkbox" id="smart-reminder-suppress-today">
+                <span>Không hiển thị lại hôm nay</span>
+              </label>
+            </div>
+          </div>
+          <div class="timer-sessions">
+            <span class="timer-session-count" id="pomodoro-count">0 phút tập trung hôm nay</span>
+            <div class="session-dot" id="sd1"></div>
+            <div class="session-dot" id="sd2"></div>
+            <div class="session-dot" id="sd3"></div>
+            <div class="session-dot" id="sd4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="card" id="tab-quick-links">
+      <div class="card-header">
+        <span class="card-title">Công cụ thường dùng</span>
+        <button class="topbar-btn ql-edit-trigger" id="ql-edit-btn" aria-pressed="false">Tùy chỉnh</button>
+      </div>
+      <div class="quick-links-panel" id="quick-links-panel"></div>
+    </div>
+
+    <!-- Client Follow-up Workspace (optional, hidden by default) -->
+    <div class="card client-followup-card card-with-footer" id="client-followup-card">
+      <div class="card-header">
+        <span class="card-title">Khách hàng &amp; Follow-up</span>
+        <button class="btn-add-meeting" id="cfu-add-btn" title="Thêm khách hàng / deal">+ Thêm</button>
+      </div>
+
+      <!-- Inline add form -->
+      <div class="cfu-form" id="cfu-form" hidden>
+        <input type="text" class="cfu-input" id="cfu-name-input" placeholder="Khách hàng / công ty (vd: ABC Manufacturing)">
+        <input type="text" class="cfu-input" id="cfu-deal-input" placeholder="Deal / ngữ cảnh (vd: Proposal follow-up)">
+        <input type="text" class="cfu-input" id="cfu-next-input" placeholder="Việc tiếp theo (vd: Gửi email nhắc báo giá)">
+        <div class="cfu-form-row">
+          <input type="date" class="cfu-input cfu-input-sm" id="cfu-date-input" aria-label="Ngày follow-up">
+          <select class="cfu-input cfu-input-sm" id="cfu-status-input" aria-label="Trạng thái">
+            <option value="today">Hôm nay</option>
+            <option value="waiting">Đang chờ phản hồi</option>
+          </select>
+        </div>
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="cfu-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="cfu-cancel-btn">Hủy</button>
+        </div>
+      </div>
+
+      <div class="cfu-empty" id="cfu-empty" hidden>
+        Chưa có khách hàng cần follow-up.<br>
+        Thêm khách hàng hoặc deal để lưu tab, ghi chú và việc cần làm tiếp theo.
+      </div>
+
+      <div class="card-footer-content cfu-body" id="cfu-body">
+        <div class="cfu-section" id="cfu-today-section" hidden>
+          <div class="cfu-section-label">Hôm nay</div>
+          <div class="cfu-list" id="cfu-today-list"></div>
+        </div>
+        <div class="cfu-section" id="cfu-waiting-section" hidden>
+          <div class="cfu-section-label">Đang chờ <span class="cfu-section-count" id="cfu-waiting-count"></span></div>
+          <div class="cfu-list" id="cfu-waiting-list"></div>
+        </div>
+      </div>
+
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="cfu-open-all">Xem tất cả →</a>
+      </div>
+    </div>
+
+    <!-- Campaign & Content Workspace (optional, hidden by default) -->
+    <div class="card client-followup-card card-with-footer" id="campaign-content-card">
+      <div class="card-header">
+        <span class="card-title">Chiến dịch &amp; Nội dung</span>
+        <button class="btn-add-meeting" id="cmc-add-btn" title="Thêm chiến dịch / nội dung">+ Thêm</button>
+      </div>
+
+      <!-- Inline add form -->
+      <div class="cfu-form" id="cmc-form" hidden>
+        <input type="text" class="cfu-input" id="cmc-name-input" placeholder="Tên nội dung / chiến dịch (vd: SEO blog: best new tab extension)">
+        <select class="cfu-input" id="cmc-type-input" aria-label="Loại nội dung">
+          <option value="blog">Bài blog / SEO</option>
+          <option value="landing">Landing page</option>
+          <option value="email">Email campaign</option>
+          <option value="social">Social post</option>
+          <option value="ads">Ads / Paid</option>
+          <option value="campaign">Chiến dịch tổng thể</option>
+          <option value="other">Khác</option>
+        </select>
+        <input type="text" class="cfu-input" id="cmc-next-input" placeholder="Việc tiếp theo (vd: Hoàn tất outline trước 3PM)">
+        <div class="cfu-form-row">
+          <input type="date" class="cfu-input cfu-input-sm" id="cmc-date-input" aria-label="Deadline">
+          <select class="cfu-input cfu-input-sm" id="cmc-status-input" aria-label="Trạng thái">
+            <option value="today">Hôm nay</option>
+            <option value="waiting">Chờ feedback / approval</option>
+            <option value="idea">Ý tưởng</option>
+          </select>
+        </div>
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="cmc-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="cmc-cancel-btn">Hủy</button>
+        </div>
+      </div>
+
+      <div class="cfu-empty" id="cmc-empty" hidden>
+        Chưa có chiến dịch hoặc nội dung nào.<br>
+        Thêm bài viết, chiến dịch hoặc ý tưởng để lưu tab, link, checklist và việc cần làm tiếp theo.
+      </div>
+
+      <div class="card-footer-content cfu-body" id="cmc-body">
+        <div class="cfu-section" id="cmc-today-section" hidden>
+          <div class="cfu-section-label">Hôm nay</div>
+          <div class="cfu-list" id="cmc-today-list"></div>
+        </div>
+        <div class="cfu-section" id="cmc-waiting-section" hidden>
+          <div class="cfu-section-label">Đang chờ <span class="cfu-section-count" id="cmc-waiting-count"></span></div>
+          <div class="cfu-list" id="cmc-waiting-list"></div>
+        </div>
+        <div class="cfu-section" id="cmc-ideas-section" hidden>
+          <div class="cfu-section-label">Ý tưởng <span class="cfu-section-count" id="cmc-ideas-count"></span></div>
+          <div class="cfu-list" id="cmc-ideas-list"></div>
+        </div>
+      </div>
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="cmc-open-all">Xem tất cả →</a>
+      </div>
+    </div>
+
+
+    <!-- Freelancer Projects (optional, hidden by default) -->
+    <div class="card fp-card card-with-footer" id="freelancer-projects-card">
+      <div class="card-header">
+        <span class="card-title">Dự án Freelancer</span>
+        <button class="btn-add-meeting" id="fp-add-btn" title="Thêm dự án freelancer">+ Thêm</button>
+      </div>
+
+      <div class="fp-stats" id="fp-stats">
+        <div class="fp-stat">
+          <span class="fp-stat-value" id="fp-active-count">0</span>
+          <span class="fp-stat-label">đang chạy</span>
+        </div>
+        <div class="fp-stat">
+          <span class="fp-stat-value" id="fp-risk-count">0</span>
+          <span class="fp-stat-label">cần chú ý</span>
+        </div>
+        <div class="fp-stat">
+          <span class="fp-stat-value" id="fp-done-count">0</span>
+          <span class="fp-stat-label">đã xong</span>
+        </div>
+      </div>
+
+      <div class="cfu-form" id="fp-form" hidden>
+        <input type="text" class="cfu-input" id="fp-name-input" placeholder="Tên dự án (vd: Website portfolio cho khách A)">
+        <input type="text" class="cfu-input" id="fp-client-input" placeholder="Khách hàng / công ty">
+        <input type="text" class="cfu-input" id="fp-next-input" placeholder="Việc tiếp theo (vd: Gửi bản demo)">
+        <input type="url" class="cfu-input" id="fp-link-input" placeholder="Workspace link: Gmail / Drive / Figma / Notion / Trello (tùy chọn)">
+        <input type="text" class="cfu-input" id="fp-scope-input" placeholder="Scope note (vd: included / out of scope / change request)">
+        <div class="cfu-form-row">
+          <input type="date" class="cfu-input cfu-input-sm" id="fp-deadline-input" aria-label="Deadline dự án">
+          <input type="number" class="cfu-input cfu-input-sm" id="fp-progress-input" min="0" max="100" step="5" value="0" aria-label="Tiến độ phần trăm">
+        </div>
+        <div class="cfu-form-row">
+          <select class="cfu-input cfu-input-sm" id="fp-status-input" aria-label="Trạng thái dự án">
+            <option value="lead">Lead / Proposed</option>
+            <option value="active">Active</option>
+            <option value="waiting">Waiting Client</option>
+            <option value="review">In Review</option>
+            <option value="change">Change Request</option>
+            <option value="invoice">Ready to Invoice</option>
+            <option value="done">Done / Archived</option>
+          </select>
+          <select class="cfu-input cfu-input-sm" id="fp-priority-input" aria-label="Mức ưu tiên">
+            <option value="normal">Bình thường</option>
+            <option value="high">Ưu tiên cao</option>
+          </select>
+        </div>
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="fp-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="fp-cancel-btn">Hủy</button>
+        </div>
+      </div>
+
+      <div class="cfu-empty" id="fp-empty" hidden>
+        Chưa có dự án freelancer nào.<br>
+        Thêm dự án để theo dõi khách hàng, tiến độ, việc tiếp theo và deadline ở một nơi.
+      </div>
+
+      <div class="card-footer-content cfu-body" id="fp-body">
+        <div class="cfu-section" id="fp-risk-section" hidden>
+          <div class="cfu-section-label">Cần chú ý <span class="cfu-section-count" id="fp-risk-section-count"></span></div>
+          <div class="cfu-list" id="fp-risk-list"></div>
+        </div>
+        <div class="cfu-section" id="fp-active-section" hidden>
+          <div class="cfu-section-label">Đang chạy <span class="cfu-section-count" id="fp-active-section-count"></span></div>
+          <div class="cfu-list" id="fp-active-list"></div>
+        </div>
+        <div class="cfu-section" id="fp-waiting-section" hidden>
+          <div class="cfu-section-label">Chờ khách <span class="cfu-section-count" id="fp-waiting-section-count"></span></div>
+          <div class="cfu-list" id="fp-waiting-list"></div>
+        </div>
+      </div>
+
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="fp-open-all">Xem tất cả →</a>
+      </div>
+    </div>
+
+    <div class="card client-followup-card card-with-footer" id="design-asset-card">
+      <div class="card-header">
+        <span class="card-title">Thiết kế &amp; Asset</span>
+        <button class="btn-add-meeting" id="dsa-add-btn" title="Thêm thiết kế / asset">+ Thêm</button>
+      </div>
+
+      <!-- Inline add form -->
+      <div class="cfu-form" id="dsa-form" hidden>
+        <input type="text" class="cfu-input" id="dsa-name-input" placeholder="Tên thiết kế / asset (vd: Landing hero Offiqa)">
+        <select class="cfu-input" id="dsa-type-input" aria-label="Loại thiết kế">
+          <option value="banner">Banner / Quảng cáo</option>
+          <option value="landing">Landing page</option>
+          <option value="social">Social media</option>
+          <option value="email">Email header</option>
+          <option value="logo">Logo / Brand</option>
+          <option value="ui">UI / Web design</option>
+          <option value="print">In ấn / Print</option>
+          <option value="other">Khác</option>
+        </select>
+        <input type="text" class="cfu-input" id="dsa-next-input" placeholder="Việc tiếp theo (vd: Sửa spacing theo feedback)">
+        <div class="cfu-form-row">
+          <input type="date" class="cfu-input cfu-input-sm" id="dsa-date-input" aria-label="Deadline">
+          <select class="cfu-input cfu-input-sm" id="dsa-status-input" aria-label="Trạng thái">
+            <option value="today">Hôm nay</option>
+            <option value="waiting">Chờ feedback / approval</option>
+            <option value="idea">Ý tưởng</option>
+          </select>
+        </div>
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="dsa-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="dsa-cancel-btn">Hủy</button>
+        </div>
+      </div>
+
+      <div class="cfu-empty" id="dsa-empty" hidden>
+        Chưa có thiết kế hoặc asset nào.<br>
+        Thêm file thiết kế, brief hoặc feedback để lưu link, ghi chú và việc cần làm tiếp theo.
+      </div>
+
+      <div class="card-footer-content cfu-body" id="dsa-body">
+        <div class="cfu-section" id="dsa-today-section" hidden>
+          <div class="cfu-section-label">Hôm nay</div>
+          <div class="cfu-list" id="dsa-today-list"></div>
+        </div>
+        <div class="cfu-section" id="dsa-waiting-section" hidden>
+          <div class="cfu-section-label">Đang chờ <span class="cfu-section-count" id="dsa-waiting-count"></span></div>
+          <div class="cfu-list" id="dsa-waiting-list"></div>
+        </div>
+        <div class="cfu-section" id="dsa-ideas-section" hidden>
+          <div class="cfu-section-label">Ý tưởng <span class="cfu-section-count" id="dsa-ideas-count"></span></div>
+          <div class="cfu-list" id="dsa-ideas-list"></div>
+        </div>
+      </div>
+
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="dsa-open-all">Xem tất cả →</a>
+      </div>
+    </div>
+
+    <!-- Sales Follow-up Desk (professional, hidden by default) -->
+    <div class="card pd-card card-with-footer" id="sales-followup-desk-card">
+      <div class="card-header">
+        <span class="card-title">Sales Follow-up Desk</span>
+        <button class="btn-add-meeting" id="sfd-add-btn" title="Thêm lead / deal">+ Thêm</button>
+      </div>
+      <div class="pd-stats">
+        <span><strong id="sfd-due-count">0</strong> follow-up</span>
+        <span><strong id="sfd-stuck-count">0</strong> cần đẩy</span>
+      </div>
+      <div class="cfu-form" id="sfd-form" hidden>
+        <input type="text" class="cfu-input" id="sfd-name-input" placeholder="Lead / account (vd: Acme Co)">
+        <input type="text" class="cfu-input" id="sfd-context-input" placeholder="Stage / pain (vd: Proposal sent - onboarding time)">
+        <input type="text" class="cfu-input" id="sfd-next-input" placeholder="Việc tiếp theo duy nhất">
+        <input type="url" class="cfu-input" id="sfd-link-input" placeholder="CRM / Gmail / LinkedIn / proposal link (tùy chọn)">
+        <div class="cfu-form-row">
+          <input type="date" class="cfu-input cfu-input-sm" id="sfd-date-input" aria-label="Ngày follow-up">
+          <select class="cfu-input cfu-input-sm" id="sfd-status-input" aria-label="Trạng thái deal">
+            <option value="due">Follow-up due</option>
+            <option value="meeting">Meeting booked</option>
+            <option value="proposal">Proposal sent</option>
+            <option value="quiet">Quiet lead</option>
+          </select>
+        </div>
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="sfd-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="sfd-cancel-btn">Hủy</button>
+        </div>
+      </div>
+      <div class="cfu-empty" id="sfd-empty" hidden>
+        Chưa có lead/deal nào cần đẩy.<br>
+        Thêm follow-up đầu tiên để không mất deal vì quên bước tiếp theo.
+      </div>
+      <div class="card-footer-content cfu-body" id="sfd-body">
+        <div class="cfu-section" id="sfd-priority-section" hidden>
+          <div class="cfu-section-label">Hôm nay / quá hạn <span class="cfu-section-count" id="sfd-priority-count"></span></div>
+          <div class="cfu-list" id="sfd-priority-list"></div>
+        </div>
+        <div class="cfu-section" id="sfd-stuck-section" hidden>
+          <div class="cfu-section-label">Cần đẩy <span class="cfu-section-count" id="sfd-stuck-section-count"></span></div>
+          <div class="cfu-list" id="sfd-stuck-list"></div>
+        </div>
+        <div class="cfu-section" id="sfd-backlog-section" hidden>
+          <div class="cfu-section-label">Pipeline <span class="cfu-section-count" id="sfd-backlog-count"></span></div>
+          <div class="cfu-list" id="sfd-backlog-list"></div>
+        </div>
+      </div>
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="sfd-open-all">Xem tất cả -></a>
+      </div>
+    </div>
+
+    <!-- Marketing Campaign Desk (professional, hidden by default) -->
+    <div class="card pd-card card-with-footer" id="marketing-campaign-desk-card">
+      <div class="card-header">
+        <span class="card-title">Marketing Campaign Desk</span>
+        <button class="btn-add-meeting" id="mcd-add-btn" title="Thêm campaign / idea">+ Thêm</button>
+      </div>
+      <div class="pd-stats">
+        <span><strong id="mcd-due-count">0</strong> cần làm</span>
+        <span><strong id="mcd-stuck-count">0</strong> approval</span>
+      </div>
+      <div class="cfu-form" id="mcd-form" hidden>
+        <input type="text" class="cfu-input" id="mcd-name-input" placeholder="Campaign / content (vd: Product launch email)">
+        <input type="text" class="cfu-input" id="mcd-context-input" placeholder="Channel / blocker (vd: Email - founder approval)">
+        <input type="text" class="cfu-input" id="mcd-next-input" placeholder="Việc marketing tiếp theo">
+        <input type="url" class="cfu-input" id="mcd-link-input" placeholder="Docs / Drive / Figma / Analytics / Ads link (tùy chọn)">
+        <div class="cfu-form-row">
+          <input type="date" class="cfu-input cfu-input-sm" id="mcd-date-input" aria-label="Deadline campaign">
+          <select class="cfu-input cfu-input-sm" id="mcd-status-input" aria-label="Trạng thái campaign">
+            <option value="due">Today priority</option>
+            <option value="approval">Waiting approval</option>
+            <option value="launch">Launch soon</option>
+            <option value="idea">Idea inbox</option>
+          </select>
+        </div>
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="mcd-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="mcd-cancel-btn">Hủy</button>
+        </div>
+      </div>
+      <div class="cfu-empty" id="mcd-empty" hidden>
+        Chưa có campaign, asset approval hoặc idea nào.<br>
+        Thêm một campaign để mở đúng workspace marketing và giữ next action rõ ràng.
+      </div>
+      <div class="card-footer-content cfu-body" id="mcd-body">
+        <div class="cfu-section" id="mcd-priority-section" hidden>
+          <div class="cfu-section-label">Hôm nay / launch gần <span class="cfu-section-count" id="mcd-priority-count"></span></div>
+          <div class="cfu-list" id="mcd-priority-list"></div>
+        </div>
+        <div class="cfu-section" id="mcd-stuck-section" hidden>
+          <div class="cfu-section-label">Approval đang kẹt <span class="cfu-section-count" id="mcd-stuck-section-count"></span></div>
+          <div class="cfu-list" id="mcd-stuck-list"></div>
+        </div>
+        <div class="cfu-section" id="mcd-backlog-section" hidden>
+          <div class="cfu-section-label">Idea / campaign khác <span class="cfu-section-count" id="mcd-backlog-count"></span></div>
+          <div class="cfu-list" id="mcd-backlog-list"></div>
+        </div>
+      </div>
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="mcd-open-all">Xem tất cả -></a>
+      </div>
+    </div>
+
+    <!-- Design Review Desk (professional, hidden by default) -->
+    <div class="card pd-card card-with-footer" id="design-review-desk-card">
+      <div class="card-header">
+        <span class="card-title">Design Review Desk</span>
+        <button class="btn-add-meeting" id="drd-add-btn" title="Thêm project / feedback">+ Thêm</button>
+      </div>
+      <div class="pd-stats">
+        <span><strong id="drd-due-count">0</strong> review</span>
+        <span><strong id="drd-stuck-count">0</strong> kẹt</span>
+      </div>
+      <div class="cfu-form" id="drd-form" hidden>
+        <input type="text" class="cfu-input" id="drd-name-input" placeholder="Design project (vd: SaaS landing page)">
+        <input type="text" class="cfu-input" id="drd-context-input" placeholder="Feedback / revision (vd: Revision 2/3 - waiting approval)">
+        <input type="text" class="cfu-input" id="drd-next-input" placeholder="Việc thiết kế tiếp theo">
+        <input type="url" class="cfu-input" id="drd-link-input" placeholder="Figma / Canva / brief / handoff link (tùy chọn)">
+        <div class="cfu-form-row">
+          <input type="date" class="cfu-input cfu-input-sm" id="drd-date-input" aria-label="Deadline design">
+          <select class="cfu-input cfu-input-sm" id="drd-status-input" aria-label="Trạng thái review">
+            <option value="due">Review today</option>
+            <option value="feedback">Waiting feedback</option>
+            <option value="approval">Waiting approval</option>
+            <option value="handoff">Ready for handoff</option>
+          </select>
+        </div>
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="drd-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="drd-cancel-btn">Hủy</button>
+        </div>
+      </div>
+      <div class="cfu-empty" id="drd-empty" hidden>
+        Chưa có feedback, revision hoặc handoff nào.<br>
+        Thêm project để giữ feedback không trôi và mở lại đúng design workspace.
+      </div>
+      <div class="card-footer-content cfu-body" id="drd-body">
+        <div class="cfu-section" id="drd-priority-section" hidden>
+          <div class="cfu-section-label">Cần review hôm nay <span class="cfu-section-count" id="drd-priority-count"></span></div>
+          <div class="cfu-list" id="drd-priority-list"></div>
+        </div>
+        <div class="cfu-section" id="drd-stuck-section" hidden>
+          <div class="cfu-section-label">Feedback / approval kẹt <span class="cfu-section-count" id="drd-stuck-section-count"></span></div>
+          <div class="cfu-list" id="drd-stuck-list"></div>
+        </div>
+        <div class="cfu-section" id="drd-backlog-section" hidden>
+          <div class="cfu-section-label">Handoff / project khác <span class="cfu-section-count" id="drd-backlog-count"></span></div>
+          <div class="cfu-list" id="drd-backlog-list"></div>
+        </div>
+      </div>
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="drd-open-all">Xem tất cả -></a>
+      </div>
+    </div>
+
+    <!-- More professional desks from multi_new_block2.docx (hidden by default) -->
+    <div class="card pd-card card-with-footer" id="accounting-client-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="hr-operations-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="purchasing-operations-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="logistics-operations-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="customer-care-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="rd-experiment-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="developer-flow-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="assistant-command-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="recruiting-pipeline-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="product-decision-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="qa-release-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="it-support-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="office-operations-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="teaching-operations-desk-card"></div>
+    <div class="card pd-card card-with-footer" id="student-study-desk-card"></div>
+
+    <!-- Waiting On (optional, hidden by default) -->
+    <div class="card wo-card card-with-footer" id="waiting-on-card">
+      <div class="card-header">
+        <span class="card-title">Đang chờ</span>
+        <button class="btn-add-meeting" id="wo-add-btn">+ Thêm</button>
+      </div>
+      <div class="cfu-form" id="wo-form" hidden>
+        <input type="text" class="cfu-input" id="wo-person-input" placeholder="Ai? (ví dụ: Sarah, Team Marketing...)">
+        <input type="text" class="cfu-input" id="wo-task-input" placeholder="Đang chờ gì?">
+        <div class="cfu-form-row">
+          <input type="date" class="cfu-input cfu-input-sm" id="wo-date-input" aria-label="Hạn chơî (tùy chọn)">
+          <select class="cfu-input cfu-input-sm" id="wo-urgency-input" aria-label="Mức ưu tiên">
+            <option value="normal">Bình thường</option>
+            <option value="urgent">Khẩn</option>
+          </select>
+        </div>
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="wo-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="wo-cancel-btn">Hủy</button>
+        </div>
+      </div>
+      <div class="cfu-empty" id="wo-empty" hidden>
+        Chưa có mục nào đang chờ.<br>Thêm việc đầu tiên bạn đang chờ người khác.
+      </div>
+      <div class="card-footer-content" id="wo-body"></div>
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="wo-open-all">Xem tất cả →</a>
+      </div>
+    </div>
+
+    <!-- Work Requests (optional, hidden by default) -->
+    <div class="card wr-card card-with-footer" id="work-requests-card">
+      <div class="card-header">
+        <span class="card-title">Việc mới nhận</span>
+        <button class="btn-add-meeting" id="wr-add-btn">+ Thêm việc</button>
+      </div>
+      <div class="cfu-form" id="wr-form" hidden>
+        <input type="text" class="cfu-input" id="wr-requester-input" placeholder="Ai yêu cầu? (ví dụ: Sếp, Client A...)">
+        <input type="text" class="cfu-input" id="wr-task-input" placeholder="Việc cần làm">
+        <div class="cfu-form-row">
+          <select class="cfu-input cfu-input-sm" id="wr-source-input" aria-label="Nguồn">
+            <option value="email">Email</option>
+            <option value="chat">Chat</option>
+            <option value="meeting">Họ̣p</option>
+            <option value="call">Cuộc gọp</option>
+            <option value="verbal">Nói miệng</option>
+            <option value="other">Khác</option>
+          </select>
+          <input type="date" class="cfu-input cfu-input-sm" id="wr-date-input" aria-label="Deadline (tùy chọn)">
+        </div>
+        <input type="url" class="cfu-input" id="wr-link-input" placeholder="Link liên quan (tùy chọn)">
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="wr-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="wr-cancel-btn">Hủy</button>
+        </div>
+      </div>
+      <div class="cfu-empty" id="wr-empty" hidden>
+        Chưa có việc nào được ghi lại.<br>Thêm ngay khi việc đến để không bị trôi mất.
+      </div>
+      <div class="card-footer-content" id="wr-body"></div>
+      <div class="card-link-footer">
+        <a class="note-link" href="#" id="wr-open-all">Xem tất cả →</a>
+      </div>
+    </div>
+
+    <!-- Deadline Radar (optional, hidden by default) -->
+    <div class="card dl-card card-with-footer" id="deadline-radar-card">
+      <div class="card-header">
+        <span class="card-title">Hạn chót gần tới</span>
+        <div class="dl-view-pills" id="dl-view-pills">
+          <button class="dl-view-pill active" data-view="today">Hôm nay</button>
+          <button class="dl-view-pill" data-view="3days">3 ngày</button>
+          <button class="dl-view-pill" data-view="week">Tuần này</button>
+        </div>
+      </div>
+      <div class="cfu-form" id="dl-form" hidden>
+        <input type="text" class="cfu-input" id="dl-task-input" placeholder="Tên việc (ví dụ: Gửi proposal cho ABC)">
+        <div class="cfu-form-row">
+          <input type="date" class="cfu-input cfu-input-sm" id="dl-date-input" aria-label="Deadline">
+          <select class="cfu-input cfu-input-sm" id="dl-urgency-input" aria-label="Mức ưu tiên">
+            <option value="normal">Bình thường</option>
+            <option value="urgent">Khẩn</option>
+          </select>
+        </div>
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="dl-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="dl-cancel-btn">Hủy</button>
+        </div>
+      </div>
+      <div class="cfu-empty" id="dl-empty" hidden>
+        Không có hạn chót nào trong khoảng này.
+      </div>
+      <div class="card-footer-content" id="dl-body"></div>
+      <div class="card-link-footer">
+        <button class="btn-add-meeting dl-inline-add" id="dl-add-btn">+ Thêm hạn chót</button>
+      </div>
+    </div>
+
+    <!-- Routine Checklist (optional, hidden by default) -->
+    <div class="card rl-card card-with-footer" id="routine-checklist-card">
+      <div class="card-header">
+        <span class="card-title">Checklist hôm nay</span>
+        <div class="rl-header-actions">
+          <button class="btn-add-meeting" id="rl-manage-btn">Quản lý</button>
+          <button class="btn-add-meeting" id="rl-reset-btn" title="Reset checklist hôm nay" hidden>Reset</button>
+        </div>
+      </div>
+      <!-- Template picker (shown when no checklist configured) -->
+      <div class="rl-template-picker" id="rl-template-picker" hidden>
+        <div class="rl-template-label">Chọn mẫu checklist</div>
+        <div class="rl-templates" id="rl-templates">
+          <button class="rl-template-btn" data-template="morning">🌅 Buổi sáng</button>
+          <button class="rl-template-btn" data-template="eod">🌇 Cuối ngày</button>
+          <button class="rl-template-btn" data-template="publish">📄 Publish</button>
+          <button class="rl-template-btn" data-template="custom">✨ Tự tạo</button>
+        </div>
+      </div>
+      <!-- Checklist body -->
+      <div class="card-footer-content" id="rl-body"></div>
+      <!-- Inline add item (shown in manage mode) -->
+      <div class="cfu-form" id="rl-add-row" hidden>
+        <div class="cfu-form-row">
+          <input type="text" class="cfu-input" id="rl-new-item-input" placeholder="Thêm mục mới...">
+          <button class="btn-meeting-save" id="rl-add-item-btn" style="flex:0 0 80px">Thêm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Links (optional, hidden by default) -->
+    <div class="card kl-card" id="key-links-card">
+      <div class="card-header">
+        <span class="card-title">Tài liệu &amp; Link</span>
+        <button class="btn-add-meeting" id="kl-add-btn">+ Thêm link</button>
+      </div>
+      <div class="cfu-form" id="kl-form" hidden>
+        <div class="cfu-form-row">
+          <input type="text" class="cfu-input" id="kl-emoji-input" placeholder="📄" maxlength="2" style="max-width:54px;text-align:center">
+          <input type="text" class="cfu-input" id="kl-name-input" placeholder="Tên (ví dụ: Weekly Report Sheet)">
+        </div>
+        <input type="url" class="cfu-input" id="kl-url-input" placeholder="https://...">
+        <div class="cfu-form-actions">
+          <button class="btn-meeting-save" id="kl-save-btn">Lưu</button>
+          <button class="btn-meeting-cancel" id="kl-cancel-btn">Hủy</button>
+        </div>
+      </div>
+      <div class="cfu-empty" id="kl-empty" hidden>
+        Chưa có link nào được lưu.<br>Thêm file, doc, sheet hoặc dashboard thường dùng.
+      </div>
+      <div class="kl-link-grid" id="kl-body"></div>
+    </div>
+
+    <!-- Update Builder (optional, hidden by default) -->
+    <div class="card ub-card" id="update-builder-card">
+      <div class="card-header">
+        <span class="card-title">Báo cáo nhanh</span>
+      </div>
+      <div class="ub-template-pills" id="ub-template-pills">
+        <button class="ub-pill active" data-tpl="daily">Daily</button>
+        <button class="ub-pill" data-tpl="weekly">Weekly</button>
+        <button class="ub-pill" data-tpl="project">Project</button>
+        <button class="ub-pill" data-tpl="recap">Recap</button>
+        <button class="ub-pill" data-tpl="blocker">Blocker</button>
+        <button class="ub-pill" data-tpl="client">Client</button>
+      </div>
+      <textarea class="ub-textarea" id="ub-textarea" rows="7" placeholder=""></textarea>
+      <div class="ub-actions">
+        <button class="btn-meeting-save ub-copy-btn" id="ub-copy-btn">📋 Copy update</button>
+        <button class="btn-meeting-cancel ub-clear-btn" id="ub-clear-btn">Xóa</button>
+      </div>
+    </div>
+
+    <!-- Handoff Pack (optional, hidden by default) -->
+    <div class="card hp-card" id="handoff-pack-card">
+      <div class="card-header">
+        <span class="card-title">Handoff nhanh</span>
+        <span class="hp-header-hint">Điền → Copy → Gửi</span>
+      </div>
+      <div class="hp-fields">
+        <div class="hp-field-group">
+          <label class="hp-label">📋 Tên việc</label>
+          <input type="text" class="cfu-input" id="hp-name" placeholder="ví dụ: Gửi file thiết kế cho Marketing">
+        </div>
+        <div class="hp-field-group">
+          <label class="hp-label">🔗 Link tài liệu</label>
+          <input type="url" class="cfu-input" id="hp-link" placeholder="https://...">
+        </div>
+        <div class="hp-field-row-2">
+          <div class="hp-field-group">
+            <label class="hp-label">📊 Trạng thái</label>
+            <input type="text" class="cfu-input" id="hp-status" placeholder="ví dụ: Đã review xong">
+          </div>
+          <div class="hp-field-group">
+            <label class="hp-label">⏰ Deadline</label>
+            <input type="date" class="cfu-input" id="hp-deadline">
+          </div>
+        </div>
+        <div class="hp-field-group">
+          <label class="hp-label">➡️ Người nhận cần làm</label>
+          <input type="text" class="cfu-input" id="hp-action" placeholder="ví dụ: Review và confirm trước 5PM">
+        </div>
+        <div class="hp-field-group">
+          <label class="hp-label">💬 Ghi chú thêm</label>
+          <input type="text" class="cfu-input" id="hp-note" placeholder="Tùy chọn...">
+        </div>
+      </div>
+      <button class="btn-meeting-save hp-copy-btn-full" id="hp-copy-btn">📋 Copy handoff</button>
+      <div class="hp-history" id="hp-history"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="offiqa-sidebar-backdrop" id="offiqa-sidebar-backdrop" hidden></div>
+<aside class="offiqa-sidebar" id="offiqa-sidebar" aria-hidden="true">
+  <div class="offiqa-sidebar-shell">
+    <button class="offiqa-sidebar-close" id="offiqa-sidebar-close" type="button" aria-label="Đóng Offiqa">
+      x
+    </button>
+    <section class="offiqa-sidebar-panel bookmark-tree-sidebar" id="bookmark-tree-sidebar" hidden>
+      <div class="bookmark-tree-sidebar-header">
+        <div>
+          <div class="bookmark-tree-sidebar-kicker">Kệ dấu trang</div>
+          <h2 class="bookmark-tree-sidebar-title">Toàn bộ nhóm</h2>
+          <p class="bookmark-tree-sidebar-desc">Xem đầy đủ nhóm dạng cây, mở nhanh từng tab hoặc cả nhóm.</p>
+        </div>
+        <button type="button" class="bookmark-tree-sidebar-launch" id="bookmark-tree-open-popup">Mở Offiqa</button>
+      </div>
+      <div class="bookmark-tree-sidebar-toolbar">
+        <input
+          type="search"
+          class="bookmark-tree-search"
+          id="bookmark-tree-search"
+          placeholder="Tìm nhóm hoặc dấu trang"
+          autocomplete="off"
+        >
+      </div>
+      <div class="bookmark-tree-sidebar-body" id="bookmark-tree-sidebar-body"></div>
+    </section>
+    <iframe
+      class="offiqa-sidebar-frame"
+      id="offiqa-sidebar-frame"
+      title="Offiqa"
+      loading="lazy"
+    ></iframe>
+  </div>
+</aside>
+
+<div class="session-modal-backdrop" id="session-modal-backdrop" hidden></div>
+
+<section class="session-modal" id="session-resume-modal" hidden aria-hidden="true">
+  <div class="session-modal-card">
+    <div class="session-modal-kicker" id="session-resume-kicker">Tiếp tục phiên</div>
+    <div class="session-modal-title-row">
+      <div>
+        <h2 class="session-modal-title" id="session-resume-title">Workspace</h2>
+        <div class="session-modal-meta" id="session-resume-meta"></div>
+      </div>
+      <button type="button" class="session-modal-close" id="session-resume-close" aria-label="Đóng">x</button>
+    </div>
+    <div class="session-modal-section">
+      <div class="session-modal-label">Đang dở</div>
+      <div class="session-modal-copy" id="session-resume-handoff"></div>
+    </div>
+    <div class="session-modal-section">
+      <div class="session-modal-label">Việc tiếp theo</div>
+      <div class="session-modal-copy" id="session-resume-next-step"></div>
+    </div>
+    <div class="session-modal-section">
+      <div class="session-modal-label">Tab sắp mở</div>
+      <div class="session-modal-tab-list" id="session-resume-tabs"></div>
+    </div>
+    <div class="session-modal-actions">
+      <button type="button" class="session-modal-primary" id="session-resume-confirm">Mở phiên</button>
+      <button type="button" class="session-modal-secondary" id="session-resume-cancel">Hủy</button>
+    </div>
+  </div>
+</section>
+
+<section class="session-modal session-save-modal" id="session-save-modal" hidden aria-hidden="true">
+  <div class="session-modal-card session-save-modal-card">
+    <div class="session-modal-kicker">Phiên mới</div>
+    <div class="session-modal-title-row">
+      <div>
+        <h2 class="session-modal-title">Lưu workspace hiện tại</h2>
+        <div class="session-modal-meta">Ghi nhanh ngữ cảnh trước khi đóng hoặc chuyển việc để lần sau mở lại là vào việc ngay.</div>
+      </div>
+      <button type="button" class="session-modal-close" id="session-save-close" aria-label="Đóng">x</button>
+    </div>
+    <div class="session-save-panel">
+      <input
+        type="text"
+        class="session-save-input"
+        id="session-name-input"
+        placeholder="Tên phiên, ví dụ: Deal ABC - nhà cung cấp nhựa"
+        autocomplete="off"
+      >
+      <textarea
+        class="session-save-textarea"
+        id="session-handoff-input"
+        rows="3"
+        placeholder="Đang dở ở đâu? (tùy chọn)"
+      ></textarea>
+      <input
+        type="text"
+        class="session-save-input"
+        id="session-next-step-input"
+        placeholder="Việc tiếp theo là gì? (tùy chọn)"
+        autocomplete="off"
+      >
+      <div class="session-save-tab-panel">
+        <div class="session-save-tab-header">
+          <div>
+            <div class="session-save-tab-title">Tab sẽ lưu</div>
+            <div class="session-save-tab-meta" id="session-save-tab-meta">0 tab</div>
+          </div>
+          <div class="session-save-tab-hint">Gỡ bớt tab không cần trước khi lưu.</div>
+        </div>
+        <div class="session-save-tab-list" id="session-save-tab-list"></div>
+      </div>
+      <div class="session-save-actions">
+        <button type="button" class="session-save-confirm" id="session-save-confirm">Lưu phiên</button>
+        <button type="button" class="session-save-cancel" id="session-save-cancel">Hủy</button>
+      </div>
+      <span class="session-save-feedback" id="session-save-feedback"></span>
+    </div>
+  </div>
+</section>
+
+<script src="../i18n/en.js"></script>
+<script src="../i18n/es.js"></script>
+<script src="../i18n/vi.js"></script>
+<script src="../shared/dexie.min.js"></script>
+<script src="../shared/idb.js"></script>
+<script src="../shared/blockRegistry.js"></script>
+<script src="../shared/appRegistry.js"></script>
+<script src="../shared/layoutPresets.js"></script>
+<script src="../customize/customize-i18n.js"></script>
+<script src="../content/smart-reminder-overlay.js"></script>
+<script src="../content/hidden-bookmark-overlay.js"></script>
+<script src="../content/quick-note-overlay.js"></script>
+<script src="newtab.js"></script>
+<script src="../customize/customize.js"></script>
+<script src="../customize/rearrange.js"></script>
+<script src="../content/quick-snippets.js"></script>
+</body>
+</html>

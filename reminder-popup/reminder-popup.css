@@ -1,0 +1,148 @@
+:root {
+  color-scheme: light;
+  --panel: rgba(255, 255, 255, 0.98);
+  --border: rgba(15, 23, 42, 0.1);
+  --text: #142033;
+  --muted: #566174;
+  --primary: #174ea6;
+  --primary-dark: #123f87;
+  --green: #16a34a;
+  --shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--text);
+  background: #f5f7fb;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.reminder-shell {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  padding: 48px 48px 38px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.reminder-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #536070;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.reminder-close:hover {
+  background: #f2f5f8;
+  color: #152236;
+}
+
+.reminder-kicker {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.reminder-title {
+  margin: 14px 0 0;
+  color: var(--primary);
+  font-size: 36px;
+  line-height: 1.12;
+  font-weight: 800;
+}
+
+.reminder-message {
+  max-width: 360px;
+  margin: 16px auto 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.reminder-meta {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.reminder-actions {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  margin-top: 28px;
+}
+
+.btn-primary {
+  min-width: 176px;
+  min-height: 46px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--primary);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 8px 18px rgba(23, 78, 166, 0.22);
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.reminder-suppress {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #253247;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reminder-suppress input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--primary);
+}
+
+@media (max-width: 520px) {
+  .reminder-shell {
+    padding: 42px 24px 30px;
+  }
+
+  .reminder-title {
+    font-size: 28px;
+  }
+}
