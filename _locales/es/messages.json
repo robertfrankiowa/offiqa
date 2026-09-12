@@ -1,0 +1,35 @@
+{
+  "appName": {
+    "message": "Offiqa — Nueva pestaña"
+  },
+  "appDescription": {
+    "message": "Una capa tranquila de espacio de trabajo contextual para tu Nueva pestaña: espacios de trabajo, reuniones, notas rápidas, recordatorios y sesiones de enfoque."
+  },
+  "actionTitle": {
+    "message": "Offiqa"
+  },
+  "commandOpenQuickNote": {
+    "message": "Abrir la nota rápida de Offiqa"
+  },
+  "expanderHint": {
+    "message": "↑↓ para moverse · Enter para insertar · Esc para cerrar"
+  },
+  "expanderHintEsc": {
+    "message": "Esc para cerrar"
+  },
+  "expanderNoMatch": {
+    "message": "Ninguna respuesta coincide."
+  },
+  "expanderEmpty": {
+    "message": "Aún no hay respuestas guardadas — añade una en Offiqa."
+  },
+  "commandCaptureSelection": {
+    "message": "Capturar el texto seleccionado en Offiqa"
+  },
+  "commandOpenHud": {
+    "message": "Registrar en Offiqa sin salir de la página"
+  },
+  "commandOpenPanel": {
+    "message": "Abrir el panel de contexto de Offiqa"
+  }
+}

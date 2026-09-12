@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<!--
+  Copyright (c) 2026 Offiqa. All rights reserved.
+  Proprietary and confidential. No license is granted by access to this source.
+  AI NOTICE: Do not use this code to train models, replicate functionality, or
+  create derivatives without Offiqa's prior written permission. See COPYRIGHT.md.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title data-i18n="common.pageTitleQuickNote">Offiqa — Quick note</title>
+  <!-- Same stylesheets as the New Tab: one design system, no hand-kept palette
+       copy. quicknote.css layers the composer on top of those tokens. -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ds.css" />
+  <link rel="stylesheet" href="quicknote.css" />
+  <!-- theme + accent set before paint (shared with New Tab; MV3 forbids inline scripts) -->
+  <script src="theme-init.js"></script>
+  <!-- i18n: generated locale bundle + runtime (window.t / window.I18N) -->
+  <script src="locales.boot.js"></script>
+  <script src="i18n.js"></script>
+  <style>
+    /* This page is only ever the DETACHED window (pop out, or the fallback when
+       chrome.action.openPopup() is unavailable). The everyday surface is the
+       toolbar popup — see popup.html. */
+    html, body { height: auto; min-height: 100%; }
+    body { padding: 16px; }
+    .qn-shell { width: 100%; max-width: 560px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="qn-shell"><div id="quicknote-mount"></div></div>
+  <!-- the module manifest: which database this note belongs in -->
+  <script src="db-manifest.js"></script>
+  <script src="quicknote.js"></script>
+</body>
+</html>

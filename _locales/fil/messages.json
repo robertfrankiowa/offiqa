@@ -1,0 +1,35 @@
+{
+  "appName": {
+    "message": "Offiqa — Bagong Tab"
+  },
+  "appDescription": {
+    "message": "Isang kalmadong context-workspace layer para sa iyong New Tab: mga workspace, meeting, quick note, paalala at focus session."
+  },
+  "actionTitle": {
+    "message": "Offiqa"
+  },
+  "commandOpenQuickNote": {
+    "message": "Buksan ang Offiqa quick note"
+  },
+  "expanderHint": {
+    "message": "↑↓ para lumipat · Enter para i-insert · Esc para isara"
+  },
+  "expanderHintEsc": {
+    "message": "Esc para isara"
+  },
+  "expanderNoMatch": {
+    "message": "Walang tugmang reply diyan."
+  },
+  "expanderEmpty": {
+    "message": "Wala pang saved reply — magdagdag sa Offiqa."
+  },
+  "commandCaptureSelection": {
+    "message": "I-capture ang selected text papunta sa Offiqa"
+  },
+  "commandOpenHud": {
+    "message": "Mag-log sa Offiqa nang hindi umaalis sa page"
+  },
+  "commandOpenPanel": {
+    "message": "Buksan ang Offiqa context panel"
+  }
+}

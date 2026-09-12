@@ -1,0 +1,79 @@
+{
+  "manifest_version": 3,
+  "default_locale": "en",
+  "name": "__MSG_appName__",
+  "version": "1.0.0",
+  "description": "__MSG_appDescription__",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "tabs",
+    "unlimitedStorage",
+    "identity",
+    "scripting",
+    "activeTab",
+    "alarms",
+    "notifications",
+    "contextMenus",
+    "sidePanel",
+    "storage",
+    "tabGroups"
+  ],
+  "host_permissions": [
+    "https://www.googleapis.com/*",
+    "https://offiqa.com/*"
+  ],
+  "optional_permissions": [
+    "management"
+  ],
+  "optional_host_permissions": [
+    "*://*/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; frame-src 'self'; base-uri 'none'; form-action 'none'"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "__MSG_actionTitle__",
+    "default_popup": "popup.html"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "commands": {
+    "open-panel": {
+      "suggested_key": {
+        "default": "Alt+O"
+      },
+      "description": "__MSG_commandOpenPanel__"
+    },
+    "open-quick-note": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "__MSG_commandOpenQuickNote__"
+    },
+    "capture-selection": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
+      },
+      "description": "__MSG_commandCaptureSelection__"
+    },
+    "open-hud": {
+      "suggested_key": {
+        "default": "Alt+L"
+      },
+      "description": "__MSG_commandOpenHud__"
+    }
+  }
+}

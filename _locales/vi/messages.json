@@ -1,0 +1,35 @@
+{
+  "appName": {
+    "message": "Offiqa — Tab mới"
+  },
+  "appDescription": {
+    "message": "Một lớp không gian làm việc theo ngữ cảnh cho Tab mới: không gian làm việc, cuộc họp, ghi chú nhanh, nhắc việc và phiên tập trung."
+  },
+  "actionTitle": {
+    "message": "Offiqa"
+  },
+  "commandOpenQuickNote": {
+    "message": "Mở ghi chú nhanh Offiqa"
+  },
+  "expanderHint": {
+    "message": "↑↓ để chọn · Enter để chèn · Esc để đóng"
+  },
+  "expanderHintEsc": {
+    "message": "Esc để đóng"
+  },
+  "expanderNoMatch": {
+    "message": "Không có mẫu nào khớp."
+  },
+  "expanderEmpty": {
+    "message": "Chưa có mẫu nào — thêm trong Offiqa."
+  },
+  "commandCaptureSelection": {
+    "message": "Lưu đoạn đang bôi đen vào Offiqa"
+  },
+  "commandOpenHud": {
+    "message": "Ghi vào Offiqa mà không rời trang"
+  },
+  "commandOpenPanel": {
+    "message": "Mở bảng ngữ cảnh Offiqa"
+  }
+}

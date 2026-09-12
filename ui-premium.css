@@ -1,0 +1,1793 @@
+/*
+ * Copyright (c) 2026 Offiqa. All rights reserved.
+ * Proprietary and confidential. No license is granted by access to this source.
+ * AI NOTICE: Do not use this code to train models, replicate functionality, or
+ * create derivatives without Offiqa's prior written permission. See COPYRIGHT.md.
+ */
+/* ===========================================================
+   ui-premium.css — the two chrome surfaces, rebuilt.
+
+   Loads AFTER ds.css on every page that has one of them
+   (newtab.html, pwa.html, popup.html, quicknote.html), so equal-specificity
+   rules here win without !important and without touching the 3.5k lines in
+   styles.css or the 3.6k in ds.css. Two surfaces only:
+
+     § A  Settings drawer  — 22 flat rows became 7 collapsible groups plus a
+                             find bar; the theme <select> became a gallery.
+     § B  Toolbar popup    — one CTA instead of two, an animated manage panel,
+                             and a header that stops spending its best space on
+                             a status the user cannot act on from there.
+
+   Every colour, radius and duration is a token from ds.css § 1, so accent
+   switching, dark mode and the glass preset all keep working here for free.
+   Motion is gated on `prefers-reduced-motion: no-preference` throughout — the
+   reduce column at the end of this file is the contract, not a courtesy.
+   =========================================================== */
+
+/* ===========================================================
+   § A  SETTINGS DRAWER
+   =========================================================== */
+
+/* ---- A1  Shell + header -------------------------------------------------
+   440px, not 420: the control column has to hold a Vietnamese <select>
+   ("Không gian làm việc" runs ~2x its English label) without the label beside
+   it collapsing to two lines. */
+.ss-sidebar {
+  width: min(440px, 100vw);
+  box-shadow: var(--el-4), inset 1px 0 0 var(--border-2);
+}
+
+/* The head names the surface now. It used to read "Offiqa v1.3.0", which says
+   what app you are in — something the user already knows — and never says what
+   the panel is. Two lines: the product, then the panel and its build. */
+.ss-head {
+  height: auto; min-height: 68px;
+  padding: var(--sp-3) var(--sp-5);
+  gap: var(--sp-3);
+}
+.ss-head-txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.ss-head .ss-brand { line-height: 1.2; }
+.ss-head-sub {
+  display: flex; align-items: center; gap: 6px;
+  font-size: var(--fs-xs); font-weight: var(--fw-medium);
+  color: rgba(255, 255, 255, .58);
+}
+.ss-head .ss-version {
+  padding: 1px 7px; font-weight: var(--fw-semi);
+  color: rgba(255, 255, 255, .62);
+  background: rgba(255, 255, 255, .1);
+}
+.ss-close {
+  align-self: flex-start;
+  transition: background var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out);
+}
+.ss-close:hover { transform: rotate(90deg); }
+
+/* ---- A2  Tabs with a sliding indicator ----------------------------------
+   The underline used to belong to the active button, so switching tabs teleported
+   it. One shared element that travels tells you which way you moved, which is
+   the only thing a tab strip can say that a list of buttons cannot. */
+.ss-tabs { position: relative; gap: 2px; }
+.ss-tab {
+  position: relative; z-index: 1;
+  border-bottom: 0; margin-bottom: 0;
+  border-radius: var(--r-xs) var(--r-xs) 0 0;
+  transition: color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+}
+.ss-tab:hover { background: var(--surface-2); }
+.ss-tab.on { border-bottom-color: transparent; }
+.ss-tab-ink {
+  position: absolute; bottom: 0; left: 0; height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--primary);
+  transition: transform var(--dur-2) var(--ease-out), width var(--dur-2) var(--ease-out);
+  pointer-events: none;
+}
+/* Before the first measurement lands there is no active width to travel to;
+   painting a 0-width bar at x=0 would flash a dot in the corner. */
+.ss-tab-ink[data-ready="0"] { opacity: 0; }
+
+/* ---- A3  Find bar -------------------------------------------------------
+   The answer to a settings panel that has outgrown one screen. It filters rows
+   across every group at once (groups force themselves open while a query is
+   live), which is why the groups below are allowed to default to collapsed. */
+/* A sibling of .ss-body, not a child of it: the drawer is a flex column and the
+   body is the only part that scrolls, so the bar stays put without needing to
+   be sticky about it. */
+.ss-find {
+  display: flex; align-items: center; gap: var(--sp-2);
+  margin: var(--sp-3) var(--sp-5) var(--sp-1);
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  box-shadow: var(--ring-soft);
+  transition: box-shadow var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+}
+.ss-find:focus-within {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--primary), 0 0 0 3px var(--primary-soft);
+}
+.ss-find svg { width: 15px; height: 15px; color: var(--faint); flex: 0 0 auto; }
+.ss-find input {
+  flex: 1 1 auto; min-width: 0;
+  border: 0; background: none; outline: none;
+  font: inherit; font-size: var(--fs-md); color: var(--text);
+}
+.ss-find input::placeholder { color: var(--faint); }
+.ss-find-x {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 20px; height: 20px; padding: 0;
+  border: 0; border-radius: 50%;
+  background: var(--surface-3); color: var(--muted);
+  cursor: pointer; transition: var(--dur-1) var(--ease-out);
+}
+.ss-find-x:hover { background: var(--border); color: var(--text); }
+.ss-find-x svg { width: 11px; height: 11px; color: inherit; }
+
+/* No match. Only reachable while filtering, and only when nothing survived. */
+.ss-find-none { display: none; padding: var(--sp-8) var(--sp-5); text-align: center; }
+.ss-body.is-find:not(:has(.ss-hit)) .ss-find-none { display: block; }
+.ss-find-none-t { font-size: var(--fs-md); font-weight: var(--fw-semi); color: var(--text); }
+.ss-find-none-b { font-size: var(--fs-sm); color: var(--muted); margin-top: 4px; }
+
+/* While a query is live, anything inside a group that is not a filterable hit
+   is noise — intros, add-a-site fields, empty states, info cards. They come
+   back the moment the query is cleared. */
+.ss-body.is-find .ss-grp-body > *:not(.ss-hit) { display: none; }
+.ss-body.is-find .ss-grp:not(:has(.ss-hit)) { display: none; }
+.ss-body.is-find .ss-grp-sum { display: none; }
+
+/* ---- A4  Groups ---------------------------------------------------------
+   Seven of them where there were eight flat SECTION captions. A caption is a
+   label; a group is a container you can close, which is the difference between
+   a list you scroll past and a list you navigate. State persists per group —
+   see SS_GRP_KEY in settings.jsx. */
+.ss-grp {
+  margin: var(--sp-2) var(--sp-4) 0;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--ring-soft);
+  overflow: hidden;
+  transition: box-shadow var(--dur-1) var(--ease-out);
+}
+.ss-grp.open { box-shadow: var(--ring), var(--el-1); }
+
+.ss-grp-head {
+  display: flex; align-items: center; gap: var(--sp-3);
+  width: 100%; padding: 13px var(--sp-4);
+  border: 0; background: none; font: inherit; text-align: left;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease-out);
+}
+.ss-grp-head:hover { background: var(--surface-2); }
+.ss-grp-ic {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 32px; height: 32px; border-radius: var(--r-sm);
+  background: var(--surface-3); color: var(--text-2);
+  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+}
+.ss-grp-ic svg { width: 16px; height: 16px; }
+.ss-grp.open .ss-grp-ic { background: var(--primary-soft); color: var(--primary); }
+.ss-grp-txt { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ss-grp-title {
+  font-size: var(--fs-md); font-weight: var(--fw-semi); color: var(--text);
+  letter-spacing: -.01em;
+}
+/* The summary is what makes a closed group readable: it answers the question
+   the group would have answered if you opened it. */
+.ss-grp-sum {
+  font-size: var(--fs-sm); color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ss-grp-chev {
+  flex: 0 0 auto; width: 15px; height: 15px; color: var(--faint);
+  transition: transform var(--dur-2) var(--ease-out), color var(--dur-1) var(--ease-out);
+}
+.ss-grp.open .ss-grp-chev { transform: rotate(90deg); color: var(--text-2); }
+
+/* 0fr → 1fr animates to the body's own height without measuring it in JS.
+   `min-height: 0` on the child is what lets the track actually shrink. */
+.ss-grp-wrap {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows var(--dur-2) var(--ease-out);
+}
+.ss-grp.open .ss-grp-wrap { grid-template-rows: 1fr; }
+.ss-grp-body { min-height: 0; overflow: hidden; }
+.ss-grp-body > :first-child { border-top: 1px solid var(--border-2); }
+
+/* ---- A5  Rows inside a group -------------------------------------------- */
+.ss-grp .ss-row {
+  padding: 10px var(--sp-4);
+  box-shadow: inset 0 -1px 0 var(--border-2);
+  transition: background var(--dur-1) var(--ease-out);
+}
+.ss-grp .ss-row:hover { background: var(--surface-2); }
+.ss-grp .ss-row:last-child { box-shadow: none; }
+.ss-grp .ss-row-ic { width: 30px; height: 30px; border-radius: var(--r-sm); background: transparent; color: var(--faint); }
+.ss-grp .ss-row:hover .ss-row-ic { color: var(--text-2); }
+.ss-grp .ss-row-ic svg { width: 16px; height: 16px; }
+.ss-grp .ss-section-head { padding: var(--sp-4) var(--sp-4) var(--sp-2); }
+.ss-grp .ss-info-block, .ss-grp .ss-snip-add, .ss-grp .ss-snip-list,
+.ss-grp .ss-snip-covered, .ss-grp .ss-snip-err { margin-left: var(--sp-4); margin-right: var(--sp-4); }
+.ss-grp .ss-snip-add { padding-bottom: var(--sp-3); }
+.ss-grp-body > .ss-info-block:last-child { margin-bottom: var(--sp-4); }
+
+/* ---- Switching module ---------------------------------------------------
+   An armed action, not a setting that has already taken effect: it gets a
+   tinted card so the row above still reads as "here is the choice" and this
+   reads as "here is what will happen". */
+.ss-module-confirm {
+  margin: 0 var(--sp-4) var(--sp-4);
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  box-shadow: var(--ring-soft);
+}
+.ss-module-note { margin: 0; font-size: var(--fs-sm); line-height: 1.55; color: var(--text-2); }
+.ss-module-carry {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-top: var(--sp-3); cursor: pointer;
+}
+.ss-module-carry input { margin-top: 3px; flex: 0 0 auto; }
+.ss-module-carry > span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ss-module-carry-title { font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--text); }
+.ss-module-carry-hint  { font-size: var(--fs-xs); line-height: 1.5; color: var(--text-3); }
+.ss-module-acts {
+  display: flex; justify-content: flex-end; gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+/* The whole point of a control column is that it lines up. `mini-select` is
+   auto-width, so seven rows of it made seven different left edges. */
+.ss-grp .ss-row-ctrl { display: flex; align-items: center; justify-content: flex-end; }
+.ss-grp .ss-row-ctrl .mini-select { min-width: 118px; }
+
+/* Conditional rows (the quiet-hours window) used to appear with a jump. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ss-row-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .ss-row-reveal { animation: ss-row-in var(--dur-2) var(--ease-out); }
+}
+
+/* ---- A6  Theme gallery --------------------------------------------------
+   A theme is a picture. Offering it as a dropdown of six words asked the user
+   to remember what "Sage" looked like; the card shows the actual wash for the
+   theme currently on screen (bgPreset reads the live light/dark table) with the
+   accent painted on a mini frame, so what you see is what lands. */
+.ss-themes {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4) var(--sp-4);
+}
+.ss-theme {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 0; border: 0; background: none; font: inherit;
+  cursor: pointer; text-align: left;
+  border-radius: var(--r-md);
+  transition: transform var(--dur-1) var(--ease-out);
+}
+.ss-theme:hover { transform: translateY(-2px); }
+.ss-theme:active { transform: translateY(0); }
+
+.ss-theme-pv {
+  position: relative; display: block;
+  aspect-ratio: 16 / 10; overflow: hidden;
+  border-radius: var(--r-sm);
+  box-shadow: var(--ring), var(--el-1);
+  transition: box-shadow var(--dur-1) var(--ease-out);
+}
+.ss-theme:hover .ss-theme-pv { box-shadow: var(--ring), var(--el-2); }
+.ss-theme.on .ss-theme-pv {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--primary), var(--el-2);
+}
+/* A mini app: accent sidebar on the left, one card floating on the preset's
+   real wash, the accent again as that card's heading. */
+.ss-theme-side { position: absolute; left: 0; top: 0; bottom: 0; width: 23%; }
+.ss-theme-card {
+  position: absolute; left: 31%; right: 9%; top: 20%; bottom: 20%;
+  display: flex; flex-direction: column; justify-content: center; gap: 4px;
+  padding: 0 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .8);
+  box-shadow: 0 1px 3px rgba(16, 24, 40, .16);
+}
+/* On a near-black canvas a white card is a hole. Depth comes from a lift, the
+   same rule ds.css § 1 applies to real surfaces in dark mode. */
+.ss-theme-pv[data-mode="dark"] .ss-theme-card {
+  background: rgba(255, 255, 255, .1); box-shadow: none;
+}
+.ss-theme-card i {
+  display: block; height: 3px; border-radius: 2px;
+  background: currentColor; opacity: .24;
+}
+.ss-theme-card .ss-theme-bar { width: 62%; height: 4px; opacity: 1; }
+.ss-theme-card i:nth-child(2) { width: 100%; }
+.ss-theme-card i:last-child { width: 68%; }
+
+.ss-theme-name {
+  display: flex; align-items: center; gap: 4px;
+  font-size: var(--fs-xs); font-weight: var(--fw-medium);
+  color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ss-theme.on .ss-theme-name { color: var(--text); font-weight: var(--fw-semi); }
+.ss-theme-name svg { width: 12px; height: 12px; color: var(--primary); flex: 0 0 auto; }
+
+/* ---- A7  Swatch rows ----------------------------------------------------
+   Bigger, and with a real selected state. At 22px with a 2px ring the six
+   background discs differed by less than the ring itself. */
+.ss-swatches { gap: var(--sp-2); }
+.ss-swatch {
+  width: 26px; height: 26px;
+  border: 0; border-radius: 50%;
+  box-shadow: var(--ring), var(--el-1);
+  transition: transform var(--dur-1) var(--ease-spring), box-shadow var(--dur-1) var(--ease-out);
+}
+.ss-swatch:hover { transform: scale(1.14); }
+.ss-swatch.on {
+  transform: scale(1.06);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text), var(--el-1);
+}
+/* The background presets are washes, not colours — in light mode all six sit
+   within a few percent of white, and six near-white 26px discs are six of the
+   same thing. Two changes make them separable: more area for the tint to live
+   in, and a different shape from the accent row above, because these two rows
+   are answering different questions (which colour vs which canvas) and looked
+   identical. */
+.ss-bg-swatch {
+  width: 38px; height: 26px; border-radius: var(--r-xs);
+  box-shadow: var(--ring), inset 0 -8px 12px -8px rgba(16, 24, 40, .3);
+}
+[data-theme="dark"] .ss-bg-swatch { box-shadow: var(--ring), inset 0 -8px 12px -8px rgba(0, 0, 0, .6); }
+.ss-bg-swatch:hover { transform: scale(1.08); }
+.ss-bg-swatch.on {
+  transform: none;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text),
+              inset 0 -8px 12px -8px rgba(16, 24, 40, .3);
+}
+/* Six 38px tiles plus gaps overflow the control column, so this one row stacks:
+   label on top, tiles under it, left-aligned to the label rather than trailing
+   off the right edge. min-height goes to 0 because the row's 52px floor was
+   sized for one line and leaves a hole under two. */
+.ss-grp .ss-row:has(.ss-bg-swatch) { flex-wrap: wrap; min-height: 0; padding-bottom: 12px; }
+.ss-grp .ss-row:has(.ss-bg-swatch) .ss-row-ctrl {
+  flex: 1 1 100%; justify-content: flex-start;
+  margin-left: 42px; margin-top: 6px;
+}
+
+/* ---- A9  Drawer motion --------------------------------------------------
+   The panel travels a short distance with a spring rather than sliding its own
+   full width — 100% of 440px reads as a page transition, which this is not. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ss-slide-in-v3 {
+    from { transform: translateX(34px); opacity: 0; }
+    to   { transform: translateX(0); opacity: 1; }
+  }
+  .ss-sidebar { animation: ss-slide-in-v3 320ms var(--ease-spring) both; }
+
+  @keyframes ss-grp-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  /* Short and shallow: this is a drawer opening, not a page. The stagger stops
+     after six because past that nothing is above the fold anyway. */
+  .ss-body > * { animation: ss-grp-in 320ms var(--ease-out) backwards; }
+  .ss-body > *:nth-child(1) { animation-delay: 40ms; }
+  .ss-body > *:nth-child(2) { animation-delay: 70ms; }
+  .ss-body > *:nth-child(3) { animation-delay: 100ms; }
+  .ss-body > *:nth-child(4) { animation-delay: 130ms; }
+  .ss-body > *:nth-child(5) { animation-delay: 160ms; }
+  .ss-body > *:nth-child(6) { animation-delay: 190ms; }
+  .ss-body > *:nth-child(n + 7) { animation-delay: 210ms; }
+  /* While filtering, rows appear and disappear on every keystroke — replaying
+     an entrance on each one is strobing, not motion. */
+  .ss-body.is-find > * { animation: none; }
+}
+
+/* ---- A10  General as a page (route "settings") --------------------------
+   Everything above was written for a 440px drawer. The General tab is a route
+   now — SettingsGeneralPage in settings.jsx — and this section is the whole
+   difference between the two shapes: a column width, and margins that belong to
+   the column instead of to a panel's inner padding. Not one row, group, toggle
+   or swatch changed.
+
+   880px, not the 1240px `.asst-embedded` gives every other page. A settings row
+   is a label on the left and its control hard against the right edge, so width
+   here is not space — it is distance between the two halves of one sentence.
+   Data & backup can be 1240 because its cards hold prose and buttons; this
+   cannot.
+
+   Compounded with `.asst-embedded` on purpose. The single class would win on
+   file order alone (ui-premium.css loads after ds.css), and a layout rule that
+   depends on nobody ever reordering two <link>s is a rule waiting to break. */
+.asst-embedded.settings-page { max-width: 880px; }
+
+/* The bar is a page element here, not a drawer sibling: its side margins were
+   the panel's gutter, and the column already supplies that. */
+.settings-page .ss-find { margin: 0 0 var(--sp-3); padding: 10px 14px; }
+
+/* Settings is now a choice of a small number of purposeful destinations, not
+   a long accordion whose only navigation is scroll. The compact rail keeps the
+   selected destination unmistakable without competing with the page heading. */
+.ss-category-nav {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin: 0 0 var(--sp-3); padding: 2px;
+}
+.ss-category-btn {
+  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  min-height: 36px; padding: 0 11px; border: 1px solid transparent;
+  border-radius: var(--r-sm); background: transparent; color: var(--muted);
+  font: inherit; font-size: var(--fs-sm); font-weight: var(--fw-medium); cursor: pointer;
+  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out);
+}
+.ss-category-btn svg { width: 14px; height: 14px; }
+.ss-category-btn:hover { background: var(--surface-2); color: var(--text); }
+.ss-category-btn.on { background: var(--primary-soft); border-color: color-mix(in srgb, var(--primary) 16%, transparent); color: var(--primary); }
+.ss-category-select-wrap { display: none; }
+
+.ss-search-results {
+  border: 1px solid var(--border); border-radius: var(--r-lg); background: var(--surface);
+  box-shadow: var(--ring), var(--el-1); overflow: hidden;
+}
+.ss-search-results-label { padding: 12px var(--sp-4) 8px; color: var(--muted); font-size: var(--fs-xs); font-weight: var(--fw-semi); text-transform: uppercase; letter-spacing: .06em; }
+.ss-search-result { display: flex; align-items: center; gap: var(--sp-3); width: 100%; min-height: 58px; padding: 9px var(--sp-4); border: 0; border-top: 1px solid var(--border-2); background: transparent; color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.ss-search-result:hover { background: var(--surface-2); }
+.ss-search-result:focus-visible { position: relative; z-index: 1; outline: 2px solid var(--primary); outline-offset: -2px; }
+.ss-search-result-ic { display: grid; place-items: center; width: 30px; height: 30px; border-radius: var(--r-sm); background: var(--surface-3); color: var(--primary); }
+.ss-search-result-ic svg, .ss-search-result-go { width: 15px; height: 15px; }
+.ss-search-result-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
+.ss-search-result-copy strong { font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.ss-search-result-copy small { color: var(--muted); font-size: var(--fs-xs); }
+.ss-search-result-go { color: var(--faint); }
+.ss-find-none-visible { display: block; border: 1px dashed var(--border); border-radius: var(--r-lg); background: var(--surface); }
+
+/* Focus is deliberately visible even when the browser's default outline is
+   suppressed by an inherited button rule. The rail, search result and group
+   heading each remain operable with Tab/Enter/Space at every density. */
+.ss-category-btn:focus-visible, .ss-grp-head:focus-visible,
+.ss-find-x:focus-visible, .ss-category-select:focus-visible {
+  position: relative; z-index: 1; outline: 2px solid var(--primary); outline-offset: 2px;
+}
+
+/* `.ss-body` is a flex child that scrolls inside the drawer. On a page the
+   PAGE scrolls, and a second scroll container inside it is how you get a
+   settings list with its own little scrollbar in the middle of the screen. */
+.settings-page .ss-body { flex: none; overflow: visible; padding-bottom: 0; }
+
+/* Same reason as the find bar, plus one step more shadow: these sit on the page
+   wash rather than on a panel, and `--ring-soft` alone reads as a card that
+   failed to paint. Matches `.asst-embedded .data-sec` next door. */
+.settings-page .ss-grp {
+  margin: 0 0 var(--sp-3);
+  box-shadow: var(--ring), var(--el-1);
+  /* A deep link (SsGroup's `focus`) scrolls a group to the top of the page,
+     and the top of the page is under a sticky topbar. Without this the group
+     it just promised to show you arrives hidden behind the crumb. */
+  scroll-margin-top: calc(var(--topbar-h) + var(--sp-4));
+}
+.settings-page .ss-grp.open { box-shadow: var(--ring), var(--el-2); }
+.settings-page .ss-grp:last-child { margin-bottom: 0; }
+
+/* The version, which used to sit under the drawer's brand mark. It is the one
+   thing that head said and this page would otherwise lose — and the number
+   people are asked for when they report something. */
+.ss-page-version {
+  font-size: var(--fs-xs); font-weight: var(--fw-medium);
+  color: var(--muted); background: var(--surface-2);
+  padding: 4px 9px; border-radius: 999px;
+  box-shadow: var(--ring-soft);
+  font-variant-numeric: tabular-nums;
+}
+.settings-page .ss-row-clickable { cursor: pointer; }
+.settings-page .ss-row-clickable:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+/* ---- Support page -------------------------------------------------------
+   A focused three-column contact surface: the new-message form on the left,
+   the inbox in the middle, and conversation detail on the right. */
+.asst-embedded.settings-page.ss-support-page { max-width: 1320px; }
+.ss-support-page .system-page-head { margin-bottom: var(--sp-5); }
+.ss-support-page .system-page-head-actions .btn { white-space: nowrap; }
+.ss-support-layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.16fr) minmax(250px, .82fr) minmax(260px, .92fr);
+  grid-template-areas: "form threads detail";
+  gap: var(--sp-4); align-items: start;
+}
+.ss-support-intro, .ss-support-card {
+  border: 1px solid var(--border-2); border-radius: var(--r-lg);
+  background: var(--surface); box-shadow: var(--ring), var(--el-1);
+}
+.ss-support-intro {
+  padding: var(--sp-6); background:
+    linear-gradient(145deg, color-mix(in srgb, var(--primary-soft) 72%, var(--surface)), var(--surface));
+}
+.ss-support-kicker {
+  display: inline-flex; align-items: center; gap: 7px; color: var(--primary);
+  font-size: var(--fs-sm); font-weight: var(--fw-semi); margin-bottom: var(--sp-4);
+}
+.ss-support-kicker svg { width: 17px; height: 17px; }
+.ss-support-intro h2, .ss-support-card h2 { margin: 0; color: var(--text); letter-spacing: -.02em; }
+.ss-support-intro h2 { font-size: var(--fs-xl); }
+.ss-support-intro > p { margin: var(--sp-3) 0 0; color: var(--muted); line-height: var(--lh-body); }
+.ss-support-account {
+  display: flex; align-items: center; gap: 8px; margin-top: var(--sp-5);
+  color: var(--text-2); font-size: var(--fs-sm); font-weight: var(--fw-medium);
+}
+.ss-support-account-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px var(--green-soft); }
+.ss-support-note {
+  display: flex; align-items: flex-start; gap: 8px; margin-top: var(--sp-5);
+  padding: var(--sp-3); border-radius: var(--r-md); background: var(--surface-2);
+  color: var(--muted); font-size: var(--fs-xs); line-height: var(--lh-body);
+}
+.ss-support-note svg { flex: 0 0 auto; width: 15px; height: 15px; color: var(--primary); margin-top: 1px; }
+.ss-support-card { padding: var(--sp-6); }
+.ss-support-card h2 { font-size: var(--fs-lg); margin-bottom: var(--sp-5); }
+.ss-support-form-intro { margin: calc(var(--sp-3) * -1) 0 var(--sp-4); color: var(--muted); font-size: var(--fs-sm); line-height: var(--lh-body); }
+.ss-support-detail { grid-area: detail; min-height: 280px; }
+.ss-support-conversation-detail { margin: 0; padding: 0; border-top: 0; }
+.ss-support-conversation-detail h2 { margin: 0 0 var(--sp-4); overflow-wrap: anywhere; }
+.ss-support-detail-empty { display: flex; min-height: 232px; flex-direction: column; align-items: flex-start; justify-content: center; }
+.ss-support-detail-empty-icon {
+  display: grid; place-items: center; width: 40px; height: 40px; margin-bottom: var(--sp-4);
+  border-radius: var(--r-md); background: var(--primary-soft); color: var(--primary);
+}
+.ss-support-detail-empty-icon svg { width: 19px; height: 19px; }
+.ss-support-detail-empty h2 { margin: 0; }
+.ss-support-detail-empty p { margin: var(--sp-2) 0 0; color: var(--muted); font-size: var(--fs-sm); line-height: var(--lh-body); }
+.ss-support-detail .ss-support-status { margin-top: var(--sp-4); margin-bottom: 0; }
+.ss-support-form { grid-area: form; }
+.ss-support-threads { grid-area: threads; }
+.ss-support-form .ss-support-kicker { margin-bottom: var(--sp-3); }
+.ss-support-form .ss-support-account { margin-top: 0; }
+.ss-support-form .ss-support-note { margin-top: var(--sp-4); margin-bottom: var(--sp-5); }
+.ss-support-field { display: flex; flex-direction: column; gap: 7px; margin-bottom: var(--sp-4); }
+.ss-support-field > span { color: var(--text-2); font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.ss-support-field :is(input, select, textarea) {
+  width: 100%; box-sizing: border-box; border: 1px solid var(--border);
+  border-radius: var(--r-sm); background: var(--surface-2); color: var(--text);
+  font: inherit; font-size: var(--fs-sm); padding: 10px 12px; outline: none;
+  transition: border-color var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out);
+}
+.ss-support-field :is(input, select):focus, .ss-support-field textarea:focus {
+  border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.ss-support-field textarea { min-height: 150px; resize: vertical; line-height: var(--lh-body); }
+.ss-support-field :is(input, select)::placeholder, .ss-support-field textarea::placeholder { color: var(--faint); }
+.ss-support-status {
+  display: flex; align-items: flex-start; gap: 8px; margin: 0 0 var(--sp-4);
+  padding: 10px 12px; border-radius: var(--r-sm); font-size: var(--fs-sm); line-height: var(--lh-body);
+}
+.ss-support-status svg { flex: 0 0 auto; width: 16px; height: 16px; margin-top: 1px; }
+.ss-support-status.is-success { color: var(--green); background: var(--green-soft); }
+.ss-support-status.is-error { color: var(--red); background: var(--red-soft); }
+.ss-support-submit { min-height: 42px; }
+.ss-support-threads-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.ss-support-threads-head h2 { margin: 0; color: var(--text); font-size: var(--fs-lg); }
+.ss-support-empty { margin: 0; color: var(--muted); line-height: var(--lh-body); }
+.ss-support-thread-list { display: flex; flex-direction: column; gap: 7px; }
+.ss-support-thread { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface-2); color: var(--text); text-align: left; cursor: pointer; }
+.ss-support-thread:hover, .ss-support-thread.on { border-color: var(--primary); background: var(--primary-soft); }
+.ss-support-thread svg { width: 15px; height: 15px; flex: 0 0 auto; color: var(--muted); }
+.ss-support-thread-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ss-support-thread-copy strong { overflow: hidden; color: var(--text); font-size: var(--fs-sm); text-overflow: ellipsis; white-space: nowrap; }
+.ss-support-thread-copy small { color: var(--muted); font-size: var(--fs-2xs); }
+.ss-support-conversation { margin-top: var(--sp-4); padding-top: var(--sp-4); border-top: 1px solid var(--border); }
+.ss-support-conversation-title { margin-bottom: var(--sp-3); color: var(--text); font-size: var(--fs-sm); font-weight: var(--fw-semi); }
+.ss-support-message-list { display: flex; flex-direction: column; gap: 8px; }
+.ss-support-message { padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); color: var(--text-2); font-size: var(--fs-sm); line-height: var(--lh-body); white-space: pre-wrap; word-break: break-word; }
+.ss-support-message.is-admin { border-color: var(--primary-border); background: var(--primary-soft); }
+.ss-support-message-meta { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 5px; color: var(--muted); font-size: var(--fs-2xs); }
+.ss-support-message-meta strong { color: var(--text); }
+.ss-support-reply { display: flex; flex-direction: column; gap: 9px; margin-top: var(--sp-3); }
+.ss-support-reply textarea { width: 100%; box-sizing: border-box; min-height: 88px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; line-height: var(--lh-body); resize: vertical; }
+.ss-support-reply textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.ss-support-auth {
+  display: flex; align-items: flex-start; gap: var(--sp-4); max-width: 680px;
+  padding: var(--sp-6); border: 1px solid var(--border-2); border-radius: var(--r-lg);
+  background: var(--surface); box-shadow: var(--ring), var(--el-1);
+}
+.ss-support-auth-icon {
+  display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: 42px;
+  border-radius: var(--r-md); color: var(--primary); background: var(--primary-soft);
+}
+.ss-support-auth-icon svg { width: 21px; height: 21px; }
+.ss-support-auth h2 { margin: 0; font-size: var(--fs-lg); }
+.ss-support-auth p { margin: var(--sp-2) 0 var(--sp-4); color: var(--muted); line-height: var(--lh-body); }
+
+@media (max-width: 1180px) and (min-width: 641px) {
+  .asst-embedded.settings-page.ss-support-page { max-width: 900px; }
+  .ss-support-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 1.1fr);
+    grid-template-areas: "threads detail" "form form";
+  }
+}
+
+/* ===========================================================
+   § B  TOOLBAR POPUP
+
+   Constraints this section is written against: Chrome caps the popup at
+   ~800x600 and paints it from a cold start every single time. That rules out
+   anything that measures, and it is why the entrance below is 200ms of opacity
+   and translate on three elements rather than a sequence.
+   =========================================================== */
+
+body.pp {
+  width: 384px;
+  padding: 0;
+  background: var(--surface-2);
+}
+
+/* ---- B1  Header ---------------------------------------------------------
+   The "Active" pill is gone from here. It stated something the user cannot act
+   on at this level — the switch that changes it lives in the manage panel —
+   while occupying the most valuable strip in the surface. It moved next to its
+   own control, where it is a label instead of a decoration. */
+.pp .pp-top {
+  align-items: center;
+  min-height: 54px;
+  padding: 11px 14px;
+  margin: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-2);
+}
+.pp .ds-side-name { letter-spacing: -.025em; font-weight: 680; }
+.pp-actions { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+.pp .pp-icon {
+  width: 30px; height: 30px; border-radius: var(--r-sm);
+  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out),
+              transform var(--dur-2) var(--ease-out);
+}
+.pp #toggle-manage.on { transform: rotate(90deg); }
+
+/* ---- B2  Composer card -------------------------------------------------- */
+.pp .pp-compose {
+  margin: 12px 12px 0;
+  padding: 15px 14px 13px;
+  border: 1px solid var(--border-2);
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--ring), var(--el-2), inset 0 1px 0 color-mix(in srgb, #fff 36%, transparent);
+}
+
+/* Vietnamese labels run about twice their English length, so the four compose
+   tools wrap to a second line and shove Save out of alignment. Tightening the
+   chips buys back the row; when it still wraps, Save keeps its own corner
+   because it is pushed by an auto margin rather than by flow. */
+.pp .qn-toolbar { flex-wrap: wrap; row-gap: var(--sp-2); }
+.pp .qn-tools { flex: 1 1 auto; gap: 2px; }
+.pp .qn-tool { padding: 5px 7px; gap: 3px; }
+.pp .qn-tool .qn-file-label, .pp .qn-tool .qn-tag-label { max-width: 84px; }
+.pp #save { margin-left: auto; }
+
+/* Recent notes are a record, not a control surface — no hover state, because a
+   hover that leads nowhere is a promise the row cannot keep. */
+.pp .qn-recent { margin-top: var(--sp-1); }
+
+/* ---- B3  Contextual offers ---------------------------------------------
+   Both of these are conditional by design: the capture button only exists when
+   there is a selection, the no-key notice only when Chrome dropped the binding.
+   They sit outside the card because they are about the page, not the note. */
+.pp .pp-capture, .pp .pp-nokey { margin: var(--sp-2) 12px 0; width: calc(100% - 24px); }
+.pp .pp-capture {
+  min-height: 36px;
+  background: var(--primary-soft);
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  color: var(--primary);
+  box-shadow: none;
+  font-weight: var(--fw-semi);
+}
+.pp .pp-capture:hover { background: color-mix(in srgb, var(--primary-soft) 72%, var(--surface)); border-color: color-mix(in srgb, var(--primary) 36%, transparent); }
+.pp .pp-nokey { border: 1px solid var(--border-2); box-shadow: var(--el-1); }
+
+/* ---- B4  Manage panel ---------------------------------------------------
+   Was `hidden`, which is a reflow with no relationship to the click that caused
+   it. Same 0fr/1fr track as the settings groups, so the two surfaces expand the
+   same way. */
+.pp .pp-manage {
+  display: grid; grid-template-rows: 0fr;
+  margin: 0; padding: 0 12px;
+  transition: grid-template-rows var(--dur-2) var(--ease-out),
+              padding-top var(--dur-2) var(--ease-out);
+}
+/* [hidden] still means hidden — from the accessibility tree as well as the
+   screen. popup.js drops the attribute one frame BEFORE adding .open, and puts
+   it back after the collapse finishes, so the panel animates without ever being
+   a 0px-tall region that a screen reader still reads out. */
+.pp .pp-manage[hidden] { display: none; }
+.pp .pp-manage.open { grid-template-rows: 1fr; padding-top: var(--sp-3); }
+.pp-manage-inner {
+  min-height: 0; overflow: hidden;
+  display: flex; flex-direction: column; gap: var(--sp-2);
+}
+.pp .pp-card { border-radius: var(--r-md); box-shadow: var(--ring), var(--el-1); }
+.pp .pp-card-title { letter-spacing: -.01em; }
+.pp .pp-switch { transition: background var(--dur-2) var(--ease-out); }
+.pp .pp-switch .pp-knob { transition: transform var(--dur-2) var(--ease-spring); }
+
+/* ---- B5  Footer ---------------------------------------------------------
+   There were two primary blue buttons on one 372px surface: Save, and Open
+   Offiqa. Only one of them is what you came here to do. */
+.pp .pp-foot {
+  margin: 0;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+.pp .pp-foot .btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  background: var(--surface); color: var(--text-2);
+  border: 1px solid var(--border-2);
+  box-shadow: none;
+  font-weight: var(--fw-medium);
+  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out),
+              box-shadow var(--dur-1) var(--ease-out);
+}
+.pp .pp-foot .btn:hover {
+  background: var(--surface-2); color: var(--text);
+  box-shadow: var(--ring), var(--el-2);
+}
+.pp-foot-arrow { width: 14px; height: 14px; margin-left: -2px; opacity: .7; }
+
+/* ---- B6  Popup motion ---------------------------------------------------
+   Cheap on purpose. Chrome paints this page cold on every open, so anything
+   that costs layout shows up as the popup arriving late. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pp-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .pp .pp-top     { animation: pp-in 200ms var(--ease-out) backwards; }
+  .pp .pp-compose { animation: pp-in 240ms var(--ease-out) 40ms backwards; }
+  .pp .pp-foot    { animation: pp-in 240ms var(--ease-out) 90ms backwards; }
+}
+
+/* ===========================================================
+   § E  ONBOARDING
+
+   The card is two columns now. The left rail is permanent and carries what the
+   old flow paged through five cards at a time; the right column is three short
+   steps that each ask one question. Everything the old .onboard-* rules styled
+   that no longer exists (feature slides, dots, the sample checkbox) is simply
+   unreferenced — the markup is gone, so those rules match nothing.
+   =========================================================== */
+
+/* The canvas behind the card. It used to be a flat --bg; a first-run screen is
+   the one moment the product gets to look like something. */
+.onboard-overlay {
+  /* The overlay is a fixed, centred grid (styles.css M-block). With nine
+     department tiles the setup step is now the tallest thing in the flow, and
+     on a short window a centred card that overflows takes the CTA off screen
+     with no way to reach it. `safe center` degrades to start alignment exactly
+     when that happens, so the scroll actually starts at the top of the card
+     rather than half a card above it. */
+  overflow: auto;
+  place-items: safe center;
+  background:
+    radial-gradient(900px 520px at 12% -8%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 62%),
+    radial-gradient(760px 480px at 92% 108%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 60%),
+    var(--bg);
+}
+
+.ob-card {
+  display: grid;
+  grid-template-columns: 268px minmax(0, 1fr);
+  max-width: 860px;
+  /* Tall enough for the taller of the two steps, so moving between them never
+     resizes the card. Measured against the role step, which is the one with the
+     five tiles and the checkbox under them. */
+  min-height: 496px;
+  border-radius: var(--r-2xl);
+  box-shadow: var(--ring), var(--el-4);
+  overflow: hidden;
+  transition: max-width var(--dur-3) var(--ease-out),
+              grid-template-columns var(--dur-3) var(--ease-out);
+}
+
+/* The language step is a gate, not a page, and it says nothing about the
+   product — so it does not get the product's panel either. Hiding the rail's
+   contents and leaving the rail was worse than showing them: a 268px empty dark
+   column reads as something that failed to load. The card is a single column
+   until there is something to put in the second one, then it opens.
+   Height is deliberately NOT animated: one axis moving is a card opening, two
+   is a card resizing. */
+.ob-card[data-step="lang"] {
+  grid-template-columns: 0px minmax(0, 1fr);
+  max-width: 480px;
+}
+.ob-card[data-step="lang"] .ob-rail { padding-left: 0; padding-right: 0; }
+
+/* The tour is the one step holding more than a question, so it is the one step
+   that gets the room. Same two columns, opened out: the grid inside needs two
+   readable columns of prose or it is a stack with extra steps, and 268 + 708 is
+   where a 14px title and a 13px description stop wrapping mid-phrase.
+
+   The ceiling is what makes the scroll happen INSIDE the card. Without it the
+   card grows to whatever sixteen items need, the overlay scrolls the whole
+   thing, and the CTA — the way OUT of a screen nobody has to read — leaves with
+   it. With it, the footer is pinned and only the list moves. `100vh - 40px`
+   keeps the shadow off the viewport edge on a laptop; the 760 caps it on a
+   desktop, where a 1200px-tall reading column is worse than a scroll. */
+.ob-card[data-step="tour"] {
+  max-width: 1040px;
+  max-height: min(calc(100vh - 40px), 760px);
+  /* A `max-height` on a grid container does NOT reach its tracks: the single
+     implicit row still sizes itself to max-content, the card clips it
+     (`overflow: hidden` above), and the footer disappears out of the bottom
+     while the list scrolls nothing. Measured, not guessed — the scroll box came
+     out 953px tall inside a 760px card. `minmax(0, 1fr)` is what makes the row
+     the card's height instead of the content's, and it is the top link of the
+     chain that ends at `.ob-tour`; every link below needs its own `min-height:
+     0` for the same reason. */
+  grid-template-rows: minmax(0, 1fr);
+}
+/* Grid items floor at `auto`, which means "as tall as my content" — so without
+   this the flex chain below never gets to shrink and the scroll box never
+   scrolls, it just pushes the footer out through the bottom of the card. */
+.ob-card[data-step="tour"] .ob-main { min-height: 0; }
+/* Centring is for the short steps. This one starts at the top and fills. */
+.ob-card[data-step="tour"] .ob-step { justify-content: flex-start; }
+.ob-card[data-step="tour"] .ob-sub { margin-bottom: var(--sp-5); }
+
+/* ---- E1  The rail ------------------------------------------------------
+   The app's own "one dark anchor per screen" recipe (ds.css § 1), so the first
+   surface a user ever sees is already speaking the product's visual language.
+   Reading five short lines beats clicking through five cards that say the same
+   thing, and it costs the flow nothing — the rail is there the whole time. */
+.ob-rail {
+  display: flex; flex-direction: column;
+  padding: var(--sp-6) var(--sp-5);
+  /* The column can be 0px wide mid-transition; without this the brand row would
+     spill across the step content on its way in and out. */
+  overflow: hidden;
+  min-width: 0;
+  color: var(--anchor-fg);
+  background-color: #16233f;
+  background-image: var(--anchor-glow), var(--anchor-bg);
+  box-shadow: var(--anchor-ring);
+}
+.ob-brand { display: flex; align-items: center; gap: 10px; }
+/* icons/logo.png is a white knockout on transparency — it reads only on a
+   coloured tile, never directly on the rail. */
+.ob-brand-tile {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 34px; height: 34px; border-radius: var(--r-sm);
+  background: var(--primary);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--primary) 45%, transparent);
+}
+.ob-brand-tile img { width: 22px; height: 22px; display: block; }
+.ob-brand-name {
+  font-size: var(--fs-lg); font-weight: var(--fw-bold);
+  letter-spacing: -.025em; color: #fff;
+}
+.ob-tagline {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-sm); line-height: var(--lh-body);
+  color: var(--anchor-fg-2);
+}
+
+.ob-feat-head {
+  margin-top: auto; padding-top: var(--sp-6);
+  font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--anchor-fg-3);
+}
+.ob-feats {
+  list-style: none; margin: var(--sp-3) 0 0; padding: 0;
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.ob-feat { display: flex; align-items: flex-start; gap: 10px; }
+.ob-feat-ic {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 26px; height: 26px; border-radius: var(--r-xs);
+  background: rgba(255, 255, 255, .1);
+  color: #fff;
+}
+.ob-feat-ic svg { width: 14px; height: 14px; }
+/* Tinted per feature so the six read as six things rather than one list.
+   Fixed hues, not the accent: these name product areas, and an area that
+   changes colour with a theme preference is not naming anything.
+
+   One class per entry in ONBOARD_FEATURES, and the names match the entries
+   rather than describing the colour — a class called `timer` on the work
+   statement is how a list drifts out of step with what it is naming. A missing
+   class is not a crash, it is worse: the icon silently falls back to the plain
+   white tile and that line stops looking like the others. */
+.ob-feat-ic.ws      { background: rgba(120, 160, 255, .2);  color: #bcd0ff; }
+.ob-feat-ic.memory  { background: rgba(180, 150, 250, .2);  color: #c9b6fb; }
+.ob-feat-ic.reach   { background: rgba(110, 220, 220, .18); color: #8fe3e3; }
+.ob-feat-ic.queue   { background: rgba(240, 180, 90, .18);  color: #f4c98a; }
+.ob-feat-ic.report  { background: rgba(110, 220, 160, .18); color: #93e3bd; }
+.ob-feat-ic.money   { background: rgba(240, 140, 140, .18); color: #f3aaa8; }
+.ob-feat-txt { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ob-feat-title { font-size: var(--fs-sm); font-weight: var(--fw-semi); color: var(--anchor-fg); }
+.ob-feat-desc { font-size: var(--fs-xs); line-height: var(--lh-snug); color: var(--anchor-fg-3); }
+
+/* ---- E1b  The loop, on the tour step only ------------------------------
+   Six words down a connected line. Deliberately the ONLY thing in this file
+   that draws a diagram: the tour grid beside it is sixteen items of prose, and
+   the one thing prose cannot show is that they are stages of a single day
+   rather than sixteen separate tools. A second list here would have been the
+   same screen twice; a shape is a different sentence.
+
+   The connector is drawn per step rather than as one line behind the column,
+   because a single line has to know where the first and last dots are and
+   re-learn it every time the list changes length. Each step draws the segment
+   BELOW itself and the last one draws nothing, which is the same rule at any
+   length. */
+.ob-loop {
+  list-style: none; margin: var(--sp-3) 0 0; padding: 0;
+  display: flex; flex-direction: column;
+  /* Paired with the `margin-top: auto` already on `.ob-feat-head`, this second
+     auto splits the rail's slack evenly above and below rather than dumping all
+     of it above. The feature list fills the same column and can be bottom-
+     anchored honestly; six one-word rows cannot — measured 290px of void in a
+     760px column, which reads as a panel that did not finish loading rather
+     than as composition. */
+  margin-bottom: auto;
+}
+.ob-loop-step {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 0;
+}
+/* 10.75 = the dot's centre (11.5) minus half the rule's width. `bottom: -5px`
+   reaches through this row's padding into the next row's, landing exactly on
+   the next dot's rim — the two paddings are what the gap is made of. */
+.ob-loop-step:not(:last-child)::before {
+  content: ""; position: absolute; left: 10.75px; top: 28px; bottom: -5px;
+  width: 1.5px; border-radius: 1px;
+  background: rgba(255, 255, 255, .16);
+}
+.ob-loop-dot {
+  position: relative; z-index: 1;
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 23px; height: 23px; border-radius: 50%;
+  background: rgba(255, 255, 255, .07);
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .2);
+  font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--anchor-fg-2);
+}
+/* The last stage is the payoff — evidence — and it is the only claim on this
+   screen a spreadsheet cannot make. Filled, so the eye lands there. */
+.ob-loop-step:last-child .ob-loop-dot {
+  background: var(--primary); box-shadow: none; color: #fff;
+}
+.ob-loop-label {
+  font-size: var(--fs-sm); font-weight: var(--fw-semi);
+  letter-spacing: -.01em; color: var(--anchor-fg);
+}
+.ob-loop-step:last-child .ob-loop-label { color: #fff; }
+
+/* ---- E2  The step column ---------------------------------------------- */
+.ob-main {
+  display: flex; flex-direction: column;
+  padding: var(--sp-8) var(--sp-8) var(--sp-5);
+  background: var(--surface);
+}
+/* Centred, not top-aligned. The rail sets the card's height, and the language
+   step has two options in it — pinned to the top, its 150px of remaining space
+   reads as a screen that failed to finish loading. Each step remounts and
+   cross-fades, so the small difference in where the title lands between steps
+   arrives as a composed screen rather than as a jump. */
+.ob-step {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; justify-content: center;
+}
+/* Bigger than the rail's copy of the tile: here it is the only brand element on
+   screen rather than one line of a header. */
+.ob-step-mark {
+  width: 46px; height: 46px; border-radius: var(--r-md);
+  margin-bottom: var(--sp-4);
+}
+.ob-step-mark img { width: 28px; height: 28px; }
+
+.ob-title {
+  margin: 0; font-size: var(--fs-2xl); font-weight: var(--fw-bold);
+  letter-spacing: -.03em; color: var(--text); line-height: var(--lh-tight);
+}
+.ob-sub {
+  margin: 7px 0 var(--sp-6);
+  font-size: var(--fs-md); line-height: var(--lh-snug); color: var(--muted);
+}
+
+/* ---- E3  Choices — one primitive, three uses -------------------------- */
+.ob-choices { display: flex; flex-direction: column; gap: var(--sp-2); }
+.ob-choice {
+  display: flex; align-items: center; gap: var(--sp-3);
+  width: 100%; padding: 14px var(--sp-4);
+  border: 0; border-radius: var(--r-lg);
+  background: var(--surface-2);
+  box-shadow: var(--ring-soft);
+  font: inherit; color: var(--text); text-align: left; cursor: pointer;
+  transition: background var(--dur-1) var(--ease-out),
+              box-shadow var(--dur-1) var(--ease-out),
+              transform var(--dur-1) var(--ease-out);
+}
+.ob-choice:hover { background: var(--surface); box-shadow: var(--ring), var(--el-1); transform: translateY(-1px); }
+.ob-choice.on {
+  background: var(--primary-soft);
+  box-shadow: inset 0 0 0 1.5px var(--primary);
+  transform: none;
+}
+.ob-choice-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ob-choice-title { font-size: var(--fs-md); font-weight: var(--fw-semi); letter-spacing: -.01em; }
+
+/* The module step's two choices. Same primitive as the language rows, but they
+   carry a sentence each rather than one word, so they need top alignment — an
+   icon centred against three lines of text floats in the middle of nowhere. */
+.ob-module { align-items: flex-start; padding: var(--sp-4); }
+.ob-module .ob-choice-body { gap: 4px; }
+.ob-module-ic {
+  flex: 0 0 auto;
+  display: grid; place-items: center;
+  width: 38px; height: 38px; margin-top: 1px;
+  border-radius: var(--r-md);
+  background: var(--surface); color: var(--primary);
+  box-shadow: var(--ring-soft);
+}
+.ob-module-ic svg { width: 20px; height: 20px; }
+.ob-module.on .ob-module-ic { background: var(--primary); color: #fff; box-shadow: none; }
+.ob-choice-desc {
+  font-size: var(--fs-sm); line-height: 1.45; color: var(--text-2);
+}
+/* The check sits with the title rather than with the block's centre, for the
+   same reason the icon does. */
+.ob-module .ob-check { align-self: flex-start; margin-top: 9px; }
+
+/* The job titles under the description. Chips rather than a comma list because
+   the eye scans a list of names for its own and stops — a sentence has to be
+   read to the end. They are ONE row of tone below the description on purpose:
+   this is a recognition aid, not a third thing to decide between, so it must
+   never out-shout the sentence it is illustrating.
+   Not clickable, and styled so: no hover, no cursor change, no border that
+   reads as a control inside a control. */
+.ob-roles { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.ob-role {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--ring-soft);
+  font-size: var(--fs-xs); line-height: 1.55; color: var(--muted);
+  white-space: nowrap;
+}
+/* On the selected tile the chips sit on primary-soft, where --surface is close
+   enough to the tile to disappear; the tint keeps them legible without turning
+   them into a second highlight. */
+.ob-choice.on .ob-role { background: var(--surface-2); box-shadow: none; }
+
+/* Quieter than .ob-note: that one announces something about to happen, this
+   one is a standing reassurance that the choice is reversible. */
+.ob-hint {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-sm); line-height: 1.5; color: var(--text-3);
+}
+
+/* Only on the language step, and only once the picked language differs from the
+   one on screen — a permanent warning about something that has not happened is
+   noise. */
+.ob-note {
+  display: flex; align-items: center; gap: 7px;
+  margin: var(--sp-2) 0 0; padding: 9px 12px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  font-size: var(--fs-sm); line-height: var(--lh-snug); color: var(--muted);
+}
+.ob-note svg { width: 14px; height: 14px; flex: 0 0 auto; color: var(--faint); }
+
+/* Setup: six industries in two rows of three, so a grid rather than a stack.
+   Tighter vertical padding than the old five-tile role grid because this step
+   now carries a field and a checkbox underneath it. */
+.ob-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-2); }
+/* Stacked, not sideways, and that is a measurement rather than a preference:
+   the tile is 171px wide and "Agency / marketing" alone is 123px, so an inline
+   icon leaves too little for the label to survive — and the Vietnamese strings
+   are longer still. The height comes out of the padding and the icon instead. */
+.ob-tile {
+  position: relative;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: var(--sp-3);
+  border: 0; border-radius: var(--r-lg);
+  background: var(--surface-2);
+  box-shadow: var(--ring-soft);
+  font: inherit; color: var(--text); text-align: left; cursor: pointer;
+  transition: background var(--dur-1) var(--ease-out),
+              box-shadow var(--dur-1) var(--ease-out),
+              transform var(--dur-1) var(--ease-out);
+}
+.ob-tile:hover { background: var(--surface); box-shadow: var(--ring), var(--el-1); transform: translateY(-2px); }
+.ob-tile.on { background: var(--primary-soft); box-shadow: inset 0 0 0 1.5px var(--primary); transform: none; }
+.ob-tile-ic {
+  display: grid; place-items: center;
+  width: 26px; height: 26px; border-radius: var(--r-sm);
+  background: var(--surface-3); color: var(--text-2);
+  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+}
+.ob-tile.on .ob-tile-ic { background: var(--primary); color: #fff; }
+.ob-tile-ic svg { width: 16px; height: 16px; }
+.ob-tile-label {
+  font-size: var(--fs-sm); font-weight: var(--fw-semi); line-height: var(--lh-snug);
+}
+
+/* "Something else" — the way out of the question, not a seventh industry. Full
+   width and laid out sideways so it reads as a different KIND of answer while
+   staying exactly as easy to click as the tiles above it. */
+.ob-tile-none {
+  grid-column: 1 / -1;
+  flex-direction: row; align-items: center; gap: var(--sp-3);
+  padding: 8px var(--sp-3);
+}
+.ob-tile-none .ob-tile-ic { width: 22px; height: 22px; }
+.ob-tile-none .ob-tile-ic svg { width: 13px; height: 13px; }
+
+/* Client Work's replacement for the task grid (see onboarding.jsx, `at ===
+   "setup"`): a pitch, not a question, so it borrows `.ob-module`'s row shape
+   rather than `.ob-tile`'s — no hover lift, no press state, no checkmark,
+   because there is nothing here to select. */
+.ob-pitch { display: flex; flex-direction: column; gap: var(--sp-3); margin-bottom: var(--sp-1); }
+.ob-pitch-item { display: flex; align-items: flex-start; gap: var(--sp-3); }
+.ob-pitch-ic {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 34px; height: 34px; margin-top: 1px;
+  border-radius: var(--r-md);
+  background: var(--surface); color: var(--primary);
+  box-shadow: var(--ring-soft);
+}
+.ob-pitch-ic svg { width: 17px; height: 17px; }
+.ob-pitch-body { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ob-pitch-title { font-size: var(--fs-md); font-weight: var(--fw-semi); color: var(--text); }
+.ob-pitch-desc { font-size: var(--fs-sm); line-height: var(--lh-snug); color: var(--text-2); }
+
+/* ---- E3b  The tour ------------------------------------------------------
+   The whole product on one screen, grouped by the loop. Nothing here is a
+   control: no hover lift, no press state, no checkmark, because there is
+   nothing to choose — same reasoning as `.ob-pitch`, at four times the length.
+
+   This is the only scrolling region in the flow, and it scrolls itself rather
+   than the page. The footer holds still, so the way out of a long screen is
+   never below the fold — which is the whole permission slip for a screen this
+   long. `overscroll-behavior: contain` stops a flick at the bottom from
+   scrolling the overlay behind it, which on a trackpad reads as the card
+   jumping. */
+.ob-tour {
+  flex: 1 1 auto; min-height: 0;
+  display: flex; flex-direction: column; gap: var(--sp-5);
+  overflow-y: auto; overscroll-behavior: contain;
+  /* Room for the scrollbar, so a description never runs underneath it. */
+  padding-right: var(--sp-3);
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--border) 65%, transparent) transparent;
+}
+.ob-tour::-webkit-scrollbar { width: 5px; }
+.ob-tour::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--border) 65%, transparent);
+  border-radius: var(--r-pill);
+}
+.ob-tour:hover::-webkit-scrollbar-thumb { background: var(--border); }
+
+.ob-tour-grp { display: flex; flex-direction: column; gap: var(--sp-3); }
+/* The rule to the right of the heading is what keeps five groups from reading
+   as one long list — the eye needs a horizontal edge to count sections by, and
+   a heavier heading alone does not give it one. */
+.ob-tour-head {
+  margin: 0; display: flex; align-items: center; gap: var(--sp-3);
+  font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+  text-transform: uppercase; letter-spacing: .1em; color: var(--text-3);
+}
+.ob-tour-head::after { content: ""; flex: 1 1 auto; height: 1px; background: var(--line); }
+.ob-tour-list {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3) var(--sp-4);
+}
+.ob-tour-item { display: flex; align-items: flex-start; gap: 10px; }
+/* One hue per GROUP, not per item: the rail's six hues name product AREAS and
+   have to stay the same colour wherever they appear, while these sixteen are
+   already grouped by the heading above them — sixteen more hues would be
+   sixteen more things to tell apart on a screen asking for a skim.
+
+   Theme tokens rather than the rail's literal rgba: that list sits on one fixed
+   dark panel, this one sits on `--surface` and has to survive both themes. Each
+   `-soft` has a real dark-mode value (styles.css), so nothing here needs a
+   `[data-theme]` rule of its own. */
+.ob-tour-ic {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 30px; height: 30px; margin-top: 1px;
+  border-radius: var(--r-sm);
+  background: var(--surface-3); color: var(--text-2);
+}
+.ob-tour-ic.tone-blue   { background: var(--primary-soft); color: var(--primary); }
+.ob-tour-ic.tone-violet { background: var(--violet-soft);  color: var(--violet); }
+.ob-tour-ic.tone-amber  { background: var(--amber-soft);   color: var(--amber); }
+.ob-tour-ic.tone-green  { background: var(--green-soft);   color: var(--green); }
+.ob-tour-ic.tone-quiet  { background: var(--surface-3);    color: var(--text-2); }
+.ob-tour-ic svg { width: 16px; height: 16px; }
+.ob-tour-body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ob-tour-title {
+  font-size: var(--fs-md); font-weight: var(--fw-semi);
+  letter-spacing: -.01em; color: var(--text);
+}
+.ob-tour-desc { font-size: var(--fs-sm); line-height: var(--lh-snug); color: var(--text-2); }
+/* Inside the scroll, not under it: it is the reward for reaching the bottom,
+   and pinning it above the footer would turn one standing sentence into a
+   second footer competing with the real one. */
+.ob-tour-foot {
+  margin: 0; padding-top: var(--sp-4);
+  box-shadow: inset 0 1px 0 var(--border-2);
+  font-size: var(--fs-sm); line-height: 1.5; color: var(--muted);
+}
+
+/* The one field in the flow that creates something. Sits between the grid and
+   the sample-data footnote, with a hairline above it so it reads as the second
+   half of one question rather than as a new screen's worth of form. */
+.ob-field {
+  display: flex; flex-direction: column; gap: 5px;
+  margin-top: var(--sp-3); padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+}
+.ob-field-label { font-size: var(--fs-md); font-weight: var(--fw-semi); color: var(--text); }
+.ob-input {
+  width: 100%; box-sizing: border-box;
+  padding: 10px var(--sp-3);
+  border: 0; border-radius: var(--r-lg);
+  background: var(--surface-2); box-shadow: var(--ring-soft);
+  font: inherit; font-size: var(--fs-md); color: var(--text);
+  transition: background var(--dur-1) var(--ease-out), box-shadow var(--dur-1) var(--ease-out);
+}
+.ob-input::placeholder { color: var(--faint); }
+.ob-input:hover { background: var(--surface); }
+.ob-input:focus { outline: none; background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--primary); }
+.ob-field-hint { font-size: var(--fs-sm); line-height: var(--lh-snug); color: var(--muted); }
+
+/* The sample-data opt-out, folded into the role step. Styled down on purpose:
+   a hairline above it and no card of its own, so it reads as a footnote on the
+   question rather than as a sixth thing to choose between. */
+.ob-opt {
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-top: var(--sp-3); padding-top: var(--sp-3);
+  box-shadow: inset 0 1px 0 var(--border-2);
+  cursor: pointer; font: inherit;
+}
+.ob-opt input[type="checkbox"] {
+  width: 17px; height: 17px; margin: 1px 0 0; flex: 0 0 auto;
+  accent-color: var(--primary); cursor: pointer;
+}
+.ob-opt-txt { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ob-opt-title { font-size: var(--fs-md); font-weight: var(--fw-semi); color: var(--text); }
+.ob-opt-hint { font-size: var(--fs-sm); line-height: var(--lh-snug); color: var(--muted); }
+
+/* The tick is the same mark in both, and it is the only thing that says
+   "chosen" without relying on the fill alone. */
+.ob-check {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  opacity: 0; transform: scale(.6);
+  transition: opacity var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-spring);
+}
+.ob-check svg { width: 12px; height: 12px; }
+.ob-choice.on .ob-check, .ob-tile.on .ob-check { opacity: 1; transform: scale(1); }
+.ob-tile .ob-check { position: absolute; top: 10px; right: 10px; }
+
+/* ---- E4  Footer -------------------------------------------------------- */
+.ob-foot {
+  display: flex; align-items: center; gap: var(--sp-3);
+  margin-top: var(--sp-6); padding-top: var(--sp-4);
+  box-shadow: inset 0 1px 0 var(--border-2);
+}
+.ob-back {
+  display: inline-flex; align-items: center; gap: 4px;
+  border: 0; background: none; padding: 6px 4px;
+  font: inherit; font-size: var(--fs-md); font-weight: var(--fw-medium);
+  color: var(--muted); cursor: pointer;
+  transition: color var(--dur-1) var(--ease-out);
+}
+.ob-back:hover { color: var(--text); }
+.ob-back:disabled { opacity: .5; cursor: default; }
+.ob-back svg { width: 15px; height: 15px; }
+
+/* Segments rather than "1 / 5". The old counter had to be read; a bar that is
+   one third full is understood without being read. */
+.ob-prog { margin: 0 auto; display: flex; gap: 5px; }
+.ob-prog-seg {
+  width: 22px; height: 4px; border-radius: var(--r-pill);
+  background: var(--border);
+  transition: background var(--dur-2) var(--ease-out), width var(--dur-2) var(--ease-out);
+}
+.ob-prog-seg.on { background: var(--primary); }
+.ob-prog-seg.on:last-of-type, .ob-prog-seg.on + .ob-prog-seg:not(.on) { width: 22px; }
+
+.ob-cta { min-width: 128px; }
+.ob-cta:disabled { opacity: .6; cursor: default; }
+
+/* ---- E5  Motion -------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ob-card-in {
+    from { opacity: 0; transform: translateY(18px) scale(.985); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .ob-card { animation: ob-card-in 460ms var(--ease-spring) both; }
+
+  @keyframes ob-rail-in {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  /* The rail introduces itself once, top to bottom. It never animates again —
+     it is the fixed part of the screen, and re-running this on every step would
+     turn the one steady thing in the flow into the busiest. */
+  .ob-brand    { animation: ob-rail-in 420ms var(--ease-out) 120ms backwards; }
+  .ob-tagline  { animation: ob-rail-in 420ms var(--ease-out) 180ms backwards; }
+  .ob-feat-head{ animation: ob-rail-in 420ms var(--ease-out) 240ms backwards; }
+  .ob-feat:nth-child(1) { animation: ob-rail-in 420ms var(--ease-out) 280ms backwards; }
+  .ob-feat:nth-child(2) { animation: ob-rail-in 420ms var(--ease-out) 330ms backwards; }
+  .ob-feat:nth-child(3) { animation: ob-rail-in 420ms var(--ease-out) 380ms backwards; }
+  .ob-feat:nth-child(4) { animation: ob-rail-in 420ms var(--ease-out) 430ms backwards; }
+  .ob-feat:nth-child(5) { animation: ob-rail-in 420ms var(--ease-out) 480ms backwards; }
+
+  /* The loop draws itself in order, first stage to last, which is the one
+     place in this flow where a sequential reveal is saying something: the six
+     things happen in that order. Faster than the rail's stagger so six steps
+     still finish inside the step transition. */
+  .ob-loop-step { animation: ob-rail-in 380ms var(--ease-out) backwards; }
+  .ob-loop-step:nth-child(1) { animation-delay: 60ms; }
+  .ob-loop-step:nth-child(2) { animation-delay: 110ms; }
+  .ob-loop-step:nth-child(3) { animation-delay: 160ms; }
+  .ob-loop-step:nth-child(4) { animation-delay: 210ms; }
+  .ob-loop-step:nth-child(5) { animation-delay: 260ms; }
+  .ob-loop-step:nth-child(6) { animation-delay: 310ms; }
+
+  /* The step is keyed on its own name in app.jsx, so React remounts it and this
+     replays on every move — forward and back, which is why it rises rather than
+     sliding in one direction. A left-to-right slide on a Back press points the
+     wrong way. */
+  @keyframes ob-step-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .ob-step { animation: ob-step-in 300ms var(--ease-out) both; }
+  .ob-step .ob-choice, .ob-step .ob-tile, .ob-step .ob-pitch-item { animation: ob-step-in 320ms var(--ease-out) backwards; }
+  .ob-step .ob-choice:nth-child(2), .ob-step .ob-tile:nth-child(2), .ob-step .ob-pitch-item:nth-child(2) { animation-delay: 45ms; }
+  .ob-step .ob-tile:nth-child(3), .ob-step .ob-pitch-item:nth-child(3) { animation-delay: 90ms; }
+  .ob-step .ob-tile:nth-child(4) { animation-delay: 135ms; }
+  .ob-step .ob-tile:nth-child(5) { animation-delay: 180ms; }
+
+  /* Group by group, not item by item. Sixteen staggered rows inside a scroll
+     box is a screen that has to finish loading before it can be read; five is
+     a page composing itself. */
+  .ob-tour-grp { animation: ob-step-in 320ms var(--ease-out) backwards; }
+  .ob-tour-grp:nth-child(2) { animation-delay: 55ms; }
+  .ob-tour-grp:nth-child(3) { animation-delay: 110ms; }
+  .ob-tour-grp:nth-child(4) { animation-delay: 165ms; }
+  .ob-tour-grp:nth-child(5) { animation-delay: 220ms; }
+}
+
+/* ---- E6  Narrow --------------------------------------------------------
+   Under ~720px the two columns cannot both be themselves. The rail keeps its
+   brand and tagline — the part that says what this is — and drops the feature
+   list, which is the part that needs room to be worth reading. */
+@media (max-width: 720px) {
+  /* The [data-step] rules above carry an attribute selector, so they out-rank a
+     plain `.ob-card` here no matter how late it appears — media queries add no
+     specificity. Restated at matching weight, which is the same trap ds.css § 9
+     and § C below document. Stacked, the rail is the card's header rather than a
+     column, so there is nothing to collapse on the language step. */
+  .ob-card, .ob-card[data-step="lang"] {
+    grid-template-columns: minmax(0, 1fr); min-height: 0; max-width: 460px;
+  }
+  /* The tour keeps its ceiling here, and that is the opposite of what it looked
+     like it should do. Letting the card grow on a phone measured 1866px tall —
+     the Continue button ended up 1874px down the page, so the way OUT of a
+     screen nobody is obliged to read was itself a full minute of scrolling.
+     Pinned, the card fits the viewport, the overlay never scrolls at all, and
+     the inner box is the only scroll on screen rather than a second one.
+     Stacked, the grid is two rows: the rail is a header band (auto) and the step
+     column takes what is left. */
+  .ob-card[data-step="tour"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    min-height: 0; max-width: 460px;
+    max-height: calc(100vh - 48px);
+  }
+  .ob-rail, .ob-card[data-step="lang"] .ob-rail { padding: var(--sp-5); }
+  /* The rail is a header band here rather than a collapsed column, so it still
+     carries the mark — and the step's own copy becomes the same logo twice,
+     40px apart. */
+  .ob-step-mark { display: none; }
+  /* The rail is a header band up here, not a column — it keeps the part that
+     says what this is and drops the parts that need vertical room. The loop is
+     six rows tall and is the same kind of casualty as the feature list. */
+  .ob-feat-head, .ob-feats, .ob-loop { display: none; }
+  .ob-tagline { margin-top: var(--sp-3); }
+  /* One column of prose — 332px is not two readable columns of it. The scroll
+     box stays a scroll box (see the card rule above). */
+  .ob-tour-list { grid-template-columns: minmax(0, 1fr); }
+  .ob-main { padding: var(--sp-6) var(--sp-5) var(--sp-4); }
+  .ob-title { font-size: var(--fs-xl); }
+  .ob-sub { margin-bottom: var(--sp-5); }
+  .ob-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* One row of titles, not six. At 375px each chip is close to its own line,
+     so the full list turns a 150px tile into a 300px one and pushes the CTA
+     off the fold — the same reason the rail's feature list is hidden up there.
+     Clipped rather than dropped: the first row is still the answer to "is this
+     for me", and the rows are uniform height, so nothing is cut mid-chip. */
+  .ob-roles { max-height: 24px; overflow: hidden; }
+}
+
+/* ===========================================================
+   § C  Narrow layer
+
+   styles.css M4 and ds.css § 9 both make the drawer full-width at <=640px.
+   This file loads after both, so the plain .ss-sidebar rule in § A1 would
+   out-cascade them (media queries carry no specificity — the same trap ds.css
+   § 9 documents). Restated here for the same reason.
+   =========================================================== */
+@media (max-width: 640px) {
+  .ss-sidebar { width: 100%; max-width: 100%; }
+  .ss-head, .ss-tabs { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .ss-find { margin-left: var(--sp-4); margin-right: var(--sp-4); }
+  .ss-grp { margin-left: var(--sp-3); margin-right: var(--sp-3); }
+  .ss-themes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .settings-page .ss-category-nav { display: none; }
+  .settings-page .ss-category-select-wrap { display: block; margin-bottom: var(--sp-3); }
+  .settings-page .ss-category-select { width: 100%; min-height: 42px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface); color: var(--text); font: inherit; }
+  .settings-page .ss-grp-head { align-items: flex-start; padding: 12px var(--sp-3); }
+  .settings-page .ss-grp-sum { white-space: normal; line-height: var(--lh-body); }
+  .settings-page .ss-grp .ss-row { align-items: flex-start; flex-wrap: wrap; }
+  .settings-page .ss-grp .ss-row:not(:has(.ss-toggle)) .ss-row-ctrl { flex: 1 1 calc(100% - 42px); max-width: none; margin-left: 42px; justify-content: flex-start; }
+  .settings-page .ss-grp .ss-row:not(:has(.ss-toggle)) .ss-row-ctrl :is(.mini-select, input, select, .btn) { width: 100%; box-sizing: border-box; }
+  .settings-page .ss-search-result { min-height: 62px; padding: 11px var(--sp-3); }
+  .ss-support-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "form" "threads" "detail";
+  }
+  .ss-support-intro, .ss-support-card, .ss-support-auth { padding: var(--sp-4); }
+}
+
+/* ===========================================================
+   § D  Reduced motion
+
+   Everything above that moves, stopped. The transitions are listed as well as
+   the animations: a 240ms grid-track transition is the same vestibular event as
+   a keyframe, and `prefers-reduced-motion` is a request about movement, not
+   about which CSS property produced it.
+   =========================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .ss-sidebar { animation: none; }
+  .ss-body > * { animation: none; }
+  .ss-tab-ink { transition: none; }
+  .ss-grp-wrap, .ss-grp-chev { transition: none; }
+  .ss-theme, .ss-swatch { transition: none; }
+  .ss-theme:hover, .ss-swatch:hover, .ss-swatch.on { transform: none; }
+  .ss-close:hover { transform: none; }
+  .pp .pp-top, .pp .pp-compose, .pp .pp-foot { animation: none; }
+  .pp .pp-manage { transition: none; }
+  .pp #toggle-manage.on { transform: none; }
+  .pp .pp-icon, .pp .pp-switch, .pp .pp-switch .pp-knob { transition: none; }
+
+  .ob-card, .ob-step, .ob-brand, .ob-tagline, .ob-feat-head, .ob-feat,
+  .ob-loop-step, .ob-tour-grp,
+  .ob-step .ob-choice, .ob-step .ob-tile, .ob-step .ob-pitch-item { animation: none; }
+  /* The card still changes width when the rail arrives — it just arrives at
+     its new width instead of travelling there. */
+  .ob-card { transition: none; }
+  .ob-choice, .ob-tile, .ob-check, .ob-prog-seg { transition: none; }
+  .ob-choice:hover, .ob-tile:hover { transform: none; }
+  .ob-check { opacity: 1; transform: none; }
+  /* With the transition gone the tick would be painted on every option, so the
+     unselected ones have to be hidden outright rather than faded out. */
+  .ob-choice:not(.on) .ob-check, .ob-tile:not(.on) .ob-check { display: none; }
+}
+
+/* ---- VA-first activation onboarding ----------------------------------- */
+.ob-card.ob-v2 {
+  grid-template-columns: minmax(250px, 34%) minmax(0, 66%);
+  width: min(880px, calc(100vw - 32px));
+  max-width: 880px;
+  min-height: min(560px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+}
+/* The account gate has one decision and no list. Giving it the same 560px box
+   as the client/tab steps left more than 200px of blank paper between the CTA
+   and footer. It keeps the same width and rail, but sizes to its own job. */
+.ob-card.ob-v2[data-step="account"], .ob-card.ob-v2[data-step="language"] { min-height: min(440px, calc(100dvh - 32px)); }
+.ob-v2 .ob-rail { padding: var(--sp-6) var(--sp-5); }
+.ob-v2 .ob-main { padding: var(--sp-5) var(--sp-6) var(--sp-4); }
+.ob-v2-head, .ob-step-label { display: flex; justify-content: space-between; gap: var(--sp-3); font-size: var(--fs-xs); color: var(--muted); }
+.ob-v2-head > span:first-child { text-transform: uppercase; letter-spacing: .08em; font-weight: var(--fw-bold); }
+.ob-locale { font-variant-numeric: tabular-nums; text-transform: uppercase; }
+/* This is the only native select in the onboarding chrome. Left unstyled it
+   arrived in the browser's 13.33px system font, square corners and black ink —
+   the most visibly unfinished control on the first screen. */
+select.ob-locale {
+  min-height: 30px; padding: 0 30px 0 10px;
+  border: 0; border-radius: var(--r-sm);
+  background-color: var(--surface-2); color: var(--text-2);
+  box-shadow: var(--ring-soft);
+  font: inherit; font-size: var(--fs-xs); font-weight: var(--fw-semi);
+  cursor: pointer;
+}
+select.ob-locale:hover { background-color: var(--surface-3); color: var(--text); }
+select.ob-locale:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.ob-step-label { margin-top: var(--sp-4); }
+.ob-v2 .ob-step { justify-content: flex-start; padding-top: var(--sp-4); gap: var(--sp-3); }
+.ob-v2 .ob-title, .ob-v2 h1 { margin: 0; max-width: 22ch; font-size: clamp(1.45rem, 2.1vw, 2rem); line-height: 1.14; letter-spacing: -.035em; }
+/* The heading receives programmatic focus on each step for assistive tech.
+   Browsers draw their default focus ring for that too, which made the title
+   look like an unstyled text field. Keyboard controls retain normal focus. */
+.ob-v2 h1:focus { outline: none; }
+.ob-v2 .ob-sub { margin: 0; max-width: 56ch; }
+.ob-role-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; max-width: 650px; }
+.ob-role-card { display: flex; flex-direction: column; gap: 5px; min-height: 104px; padding: 13px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface-2); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.ob-role-card strong { font-size: var(--fs-sm); }
+.ob-role-card span { color: var(--muted); font-size: var(--fs-xs); line-height: var(--lh-snug); }
+.ob-role-card:hover { border-color: color-mix(in srgb, var(--primary) 45%, var(--line)); background: var(--surface-3); }
+.ob-role-card.selected { border-color: var(--primary); background: var(--primary-soft); box-shadow: 0 0 0 1px var(--primary); }
+.ob-role-card:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.ob-stack { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: auto; color: var(--anchor-fg); }
+.ob-stack > strong { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .08em; color: var(--anchor-fg-3); }
+.ob-desk { display: flex; align-items: baseline; gap: 7px; padding: 10px; border-radius: var(--r-sm); background: rgba(255,255,255,.06); color: var(--anchor-fg-2); }
+.ob-desk.active { background: rgba(255,255,255,.14); color: #fff; }
+.ob-desk small { margin-left: auto; color: inherit; opacity: .7; }
+.ob-flow { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--anchor-fg-3); }
+.ob-v2 .ob-field { gap: 6px; max-width: 600px; }
+.ob-v2 .ob-field small, .ob-tabs > small { color: var(--muted); line-height: var(--lh-snug); }
+.ob-v2 textarea { width: 100%; min-height: 82px; resize: vertical; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface-2); color: var(--text); font: inherit; }
+.ob-tabs { display: flex; flex-direction: column; gap: 7px; max-height: 175px; overflow: auto; padding: var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-sm); }
+.ob-tab { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 44px; cursor: pointer; }
+.ob-tab span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ob-tab small { color: var(--muted); }
+.ob-trust, .ob-note { margin: 0; color: var(--muted); font-size: var(--fs-sm); }
+.ob-auth { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; align-items: center; }
+.ob-auth input { min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface-2); color: var(--text); }
+.ob-link { border: 0; background: transparent; color: var(--primary); padding: 8px; cursor: pointer; font: inherit; text-align: left; }
+.ob-error { margin: 0; color: var(--red, #b42318); font-size: var(--fs-sm); }
+.ob-proof { padding: var(--sp-4); border-left: 3px solid var(--primary); background: var(--primary-soft); border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+.ob-proof p { margin: 7px 0 0; }
+.ob-value-list { display: grid; gap: 8px; width: min(100%, 620px); }
+.ob-value-item { padding: 11px 13px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--surface-2); }
+.ob-value-item strong, .ob-value-item span { display: block; }
+.ob-value-item strong { font-size: var(--fs-sm); color: var(--text); }
+.ob-value-item span { margin-top: 3px; font-size: var(--fs-xs); line-height: var(--lh-snug); color: var(--muted); }
+.ob-sample-choice { display: flex; align-items: flex-start; gap: 10px; width: min(100%, 620px); padding: 12px 13px; border: 1px solid var(--line); border-radius: var(--r-sm); background: var(--primary-soft); cursor: pointer; }
+.ob-sample-choice input { width: 17px; height: 17px; margin-top: 2px; accent-color: var(--primary); flex: none; cursor: pointer; }
+.ob-sample-choice strong, .ob-sample-choice small { display: block; }
+.ob-sample-choice strong { font-size: var(--fs-sm); color: var(--text); }
+.ob-sample-choice small, .ob-sample-remove { margin-top: 3px; font-size: var(--fs-xs); line-height: var(--lh-snug); color: var(--muted); }
+.ob-sample-remove { width: min(100%, 620px); margin-bottom: 0; }
+.ob-v2 .ob-foot { min-height: 48px; margin-top: auto; }
+.ob-v2 .ob-cta.btn.primary {
+  min-height: 42px;
+  background: var(--primary);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .12), 0 6px 16px -8px color-mix(in srgb, var(--primary) 46%, transparent);
+}
+.ob-v2 .ob-cta.btn.primary:hover {
+  filter: brightness(1.04);
+  box-shadow: 0 2px 4px rgba(16, 24, 40, .14), 0 10px 22px -10px color-mix(in srgb, var(--primary) 52%, transparent);
+}
+@media (max-width: 720px) {
+  .ob-card.ob-v2 { grid-template-columns: minmax(0, 1fr); width: min(540px, calc(100vw - 24px)); min-height: 0; max-width: 540px; }
+  .ob-v2 .ob-rail { padding: var(--sp-4) var(--sp-5); }
+  .ob-v2 .ob-stack { flex-direction: row; flex-wrap: wrap; margin-top: var(--sp-3); }
+  .ob-stack > strong, .ob-flow { width: 100%; }
+  .ob-desk { flex: 1 1 140px; }
+  .ob-v2 .ob-main { padding: var(--sp-5) var(--sp-4) var(--sp-4); }
+  .ob-role-grid { grid-template-columns: 1fr; }
+  .ob-auth { grid-template-columns: 1fr; }
+  .ob-v2 .ob-foot { flex-wrap: wrap; gap: 4px; }
+  .ob-v2 .ob-prog { order: -1; width: 100%; justify-content: center; }
+}
+
+/* ---- Onboarding story rail -------------------------------------------
+   The rail is the product's first impression, so it does more than carry a
+   logo: it explains the promise, previews the workspace model, and keeps the
+   user's place in the flow. All decoration stays CSS/SVG so it remains sharp
+   at extension and PWA scale. */
+.ob-card.ob-v2 {
+  grid-template-columns: 390px minmax(0, 1fr);
+  width: min(1040px, calc(100vw - 32px));
+  max-width: 1040px;
+  min-height: min(650px, calc(100dvh - 32px));
+}
+.ob-card.ob-v2[data-step="account"],
+.ob-card.ob-v2[data-step="language"] { min-height: min(650px, calc(100dvh - 32px)); }
+.ob-v2 .ob-rail {
+  position: relative;
+  isolation: isolate;
+  padding: 30px 36px 26px;
+  background:
+    radial-gradient(80% 46% at 102% 4%, rgba(69, 106, 255, .32), transparent 68%),
+    radial-gradient(70% 44% at 80% 52%, rgba(12, 80, 230, .16), transparent 72%),
+    linear-gradient(155deg, #071426 0%, #071122 44%, #050d1c 100%);
+  box-shadow: inset -1px 0 rgba(148, 181, 255, .13);
+}
+.ob-v2 .ob-rail::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  width: 310px;
+  height: 310px;
+  top: -190px;
+  right: -122px;
+  border-radius: 50%;
+  border: 1px solid rgba(119, 153, 255, .48);
+  background: radial-gradient(circle at 40% 60%, rgba(58, 91, 255, .52), rgba(19, 44, 113, .24) 42%, rgba(5, 13, 29, 0) 70%);
+  box-shadow: inset 0 0 42px rgba(74, 109, 255, .38), 0 0 70px rgba(35, 83, 255, .2);
+}
+.ob-v2 .ob-rail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  opacity: .22;
+  background-image:
+    radial-gradient(circle at 18% 28%, rgba(255,255,255,.85) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 78% 38%, rgba(110,159,255,.8) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 55% 16%, rgba(255,255,255,.55) 0 1px, transparent 1.4px);
+  background-size: 137px 149px, 181px 193px, 223px 211px;
+}
+.ob-rail-glow {
+  position: absolute;
+  z-index: -1;
+  top: 188px;
+  right: -98px;
+  width: 250px;
+  height: 310px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(23, 79, 229, .22), transparent 74%);
+  filter: blur(6px);
+  pointer-events: none;
+}
+.ob-v2 .ob-brand { position: relative; z-index: 2; gap: 12px; }
+.ob-v2 .ob-brand-tile {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #2584ff, #0757ef);
+  border: 1px solid rgba(255,255,255,.24);
+  box-shadow: 0 10px 24px rgba(0, 91, 255, .38), inset 0 1px rgba(255,255,255,.22);
+}
+.ob-v2 .ob-brand-tile img { width: 27px; height: 27px; }
+.ob-v2 .ob-brand-name { font-size: 1.1rem; letter-spacing: -.03em; }
+.ob-rail-hero { position: relative; z-index: 2; margin-top: 32px; }
+.ob-rail-eyebrow {
+  margin: 0 0 10px;
+  color: #91a2c5;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.ob-rail-hero h2 {
+  margin: 0;
+  max-width: 9ch;
+  color: #f8fbff;
+  font-size: clamp(2.05rem, 3.4vw, 2.55rem);
+  font-weight: 650;
+  line-height: 1.02;
+  letter-spacing: -.055em;
+}
+.ob-rail-hero h2 span {
+  display: block;
+  color: #65a0ff;
+  background: linear-gradient(100deg, #69a8ff 5%, #3c75ff 92%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.ob-v2 .ob-tagline {
+  max-width: 245px;
+  margin: 13px 0 0;
+  color: #9eabc2;
+  font-size: 13px;
+  line-height: 1.48;
+}
+.ob-rail-features {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  margin-top: 34px;
+}
+.ob-rail-feature { position: relative; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 11px; align-items: start; }
+.ob-rail-feature:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 41px;
+  left: 18px;
+  width: 1px;
+  height: 25px;
+  background: linear-gradient(rgba(94, 125, 184, .28), rgba(94, 125, 184, .06));
+}
+.ob-rail-feature-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: #b9c7e0;
+  background: linear-gradient(145deg, rgba(24, 41, 72, .92), rgba(12, 25, 49, .92));
+  border: 1px solid rgba(140, 169, 221, .1);
+  box-shadow: 0 8px 20px rgba(0, 6, 18, .18), inset 0 1px rgba(255,255,255,.035);
+}
+.ob-rail-feature-icon svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.ob-rail-feature strong, .ob-rail-feature small { display: block; }
+.ob-rail-feature strong { padding-top: 1px; color: #f1f5fc; font-size: 12px; font-weight: 620; line-height: 1.28; }
+.ob-rail-feature small { margin-top: 4px; color: #8290aa; font-size: 10px; line-height: 1.35; }
+.ob-rail-progress {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: auto;
+  padding-top: 20px;
+}
+.ob-rail-progress::before {
+  content: "";
+  position: absolute;
+  top: 34px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: rgba(111, 139, 190, .2);
+}
+.ob-rail-progress-step { position: relative; display: flex; align-items: center; flex-direction: column; gap: 7px; min-width: 0; color: #6e7d99; }
+.ob-rail-progress-step > span {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(128, 155, 203, .14);
+  border-radius: 50%;
+  background: #102039;
+  color: #a8b6ce;
+  font-size: 10px;
+  font-weight: 700;
+  box-shadow: 0 0 0 4px #071122;
+}
+.ob-rail-progress-step small { width: 100%; overflow: hidden; color: inherit; font-size: 8px; line-height: 1.2; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.ob-rail-progress-step.current { color: #71a8ff; }
+.ob-rail-progress-step.current > span { border-color: #2e82ff; background: #1671f8; color: #fff; box-shadow: 0 0 0 4px #071122, 0 0 18px rgba(36, 119, 255, .5); }
+.ob-rail-progress-step.done { color: #91a7cb; }
+.ob-rail-progress-step.done > span { border-color: rgba(68, 134, 250, .48); background: #153b76; color: #c7dcff; }
+.ob-v2 .ob-main { padding: 30px 42px 24px; }
+.ob-v2 .ob-foot { justify-content: space-between; }
+/* Keep optional actions with the primary decision. The back action stays at
+   the start; when present, Skip fills the remaining space before Continue. */
+.ob-v2 .ob-foot > .ob-link { margin-left: auto; }
+
+@media (min-width: 721px) and (max-width: 980px) {
+  .ob-card.ob-v2 { grid-template-columns: 330px minmax(0, 1fr); }
+  .ob-v2 .ob-rail { padding-left: 30px; padding-right: 30px; }
+  .ob-rail-hero h2 { font-size: 2.15rem; }
+  .ob-rail-features { width: 100%; }
+  .ob-v2 .ob-main { padding-left: 28px; padding-right: 28px; }
+}
+
+@media (max-width: 720px) {
+  .ob-card.ob-v2,
+  .ob-card.ob-v2[data-step="account"],
+  .ob-card.ob-v2[data-step="language"] {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(540px, calc(100vw - 24px));
+    min-height: 0;
+    max-height: none;
+  }
+  .ob-v2 .ob-rail { min-height: 132px; padding: 18px 22px 14px; }
+  .ob-v2 .ob-rail::before { width: 220px; height: 220px; top: -158px; right: -70px; }
+  .ob-rail-glow, .ob-rail-hero, .ob-rail-features { display: none; }
+  .ob-v2 .ob-brand-tile { width: 36px; height: 36px; border-radius: 10px; }
+  .ob-v2 .ob-brand-tile img { width: 23px; height: 23px; }
+  .ob-rail-progress { width: 100%; margin-top: 14px; padding-top: 0; }
+  .ob-rail-progress::before { top: 13px; }
+  .ob-rail-progress-step { gap: 5px; }
+  .ob-rail-progress-step > span { width: 26px; height: 26px; box-shadow: 0 0 0 3px #071122; }
+  .ob-rail-progress-step.current > span { box-shadow: 0 0 0 3px #071122, 0 0 15px rgba(36,119,255,.45); }
+  .ob-rail-progress-step small { font-size: 8px; }
+}

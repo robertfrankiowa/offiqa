@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<!--
+  Copyright (c) 2026 Offiqa. All rights reserved.
+  Proprietary and confidential. No license is granted by access to this source.
+  AI NOTICE: Do not use this code to train models, replicate functionality, or
+  create derivatives without Offiqa's prior written permission. See COPYRIGHT.md.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Offiqa</title>
+  <!-- Same stylesheets as the New Tab. This popup used to carry its own
+       hand-copied palette, which drifted every time ds.css moved; now the two
+       surfaces read from one set of tokens. quicknote.css layers the composer
+       on top. -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ds.css" />
+  <link rel="stylesheet" href="quicknote.css" />
+  <!-- premium chrome: the popup shell + the settings drawer, shared with the New Tab -->
+  <link rel="stylesheet" href="ui-premium.css" />
+  <!-- theme + accent set before paint (shared with New Tab; MV3 forbids inline scripts) -->
+  <script src="theme-init.js"></script>
+  <!-- i18n: generated locale bundle + runtime (window.t / window.I18N) -->
+  <script src="locales.boot.js"></script>
+  <script src="i18n.js"></script>
+  <style>
+    /* Popup shell only. Everything that has a New Tab equivalent (.ds-side-brand,
+       .btn, .field, .qn-*) is left to styles.css / ds.css / quicknote.css, and
+       the shell's geometry + motion now live in ui-premium.css § B. */
+    html, body { height: auto; }
+    body { font-size: 14px; }
+
+    /* ---- top bar: the New Tab sidebar's brand row, reused verbatim ---- */
+    .pp-top { display: flex; align-items: center; gap: 9px; }
+    .pp-top .ds-side-name { font-size: var(--fs-lg); }
+    /* The status pill lives beside its own switch now (see .pp-card below), not
+       in the header — it stated something the user could not act on from there
+       while taking the most valuable strip on a 384px surface. */
+    .pp-status {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 10px; border-radius: var(--r-pill);
+      background: var(--green-soft); color: var(--green);
+      font-size: var(--fs-xs); font-weight: var(--fw-semi);
+    }
+    .pp-status.off { background: var(--surface-3); color: var(--muted); }
+    .pp-status .pp-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: currentColor; box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 22%, transparent);
+    }
+    .pp-icon {
+      flex: 0 0 auto; width: 28px; height: 28px;
+      display: grid; place-items: center;
+      border: 0; border-radius: var(--r-sm); background: none;
+      color: var(--muted); font-size: 14px; line-height: 1; cursor: pointer;
+      transition: .14s;
+    }
+    .pp-icon:hover { background: var(--surface-3); color: var(--text); }
+    .pp-icon.on { background: var(--primary-soft); color: var(--primary); }
+
+    /* ---- composer card ---- */
+    .pp-compose {
+      background: var(--surface);
+      border-radius: var(--r-xl);
+      box-shadow: var(--ring), var(--el-2);
+      padding: 14px;
+    }
+
+    /* Only rendered when the page actually has a selection, so it reads as an
+       offer about the thing in front of you rather than a permanent control. */
+    .pp-capture { width: 100%; margin-top: var(--sp-2); justify-content: center; }
+    .pp-capture[hidden] { display: none; }
+
+    /* Quiet, not alarming: nothing is broken, a key is simply unassigned. */
+    .pp-nokey {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      margin-top: var(--sp-2); padding: 7px 10px;
+      border-radius: var(--r-lg); background: var(--surface-2);
+      font-size: 12px; line-height: 1.4; color: var(--muted);
+    }
+    .pp-nokey[hidden] { display: none; }
+    .pp-nokey-btn {
+      border: 0; background: none; padding: 0; cursor: pointer;
+      font: inherit; font-weight: 620; color: var(--primary);
+      text-decoration: underline; text-underline-offset: 2px;
+    }
+
+    /* ---- manage panel (hidden behind the gear) ----
+       The expand/collapse geometry is ui-premium.css § B4; this is only what the
+       cards inside it look like. */
+    .pp-card {
+      display: flex; align-items: center; gap: var(--sp-3);
+      background: var(--surface);
+      border-radius: var(--r-lg);
+      box-shadow: var(--ring), var(--el-1);
+      padding: 12px 13px;
+    }
+    .pp-card-main { flex: 1 1 auto; min-width: 0; }
+    .pp-card-title { font-size: var(--fs-md); font-weight: var(--fw-semi); color: var(--text); }
+    .pp-card-desc { color: var(--muted); font-size: var(--fs-sm); margin-top: 3px; line-height: var(--lh-snug); }
+    .pp-card-desc kbd {
+      font-family: 'Geist Mono', monospace; font-size: 11px; font-weight: 620;
+      background: var(--surface-3); border: 1px solid var(--border);
+      border-radius: 6px; padding: 1px 5px; margin: 0 1px; color: var(--text-2);
+    }
+    .pp-card-aside { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
+    .pp-toggle-label { color: var(--primary); font-weight: var(--fw-semi); font-size: var(--fs-sm); }
+
+    /* switch — the popup's own control; the New Tab has no equivalent */
+    .pp-switch {
+      position: relative; width: 42px; height: 23px; flex: 0 0 auto;
+      border: 0; border-radius: var(--r-pill); background: var(--border);
+      cursor: pointer; padding: 0; transition: background .18s ease;
+    }
+    .pp-switch.on { background: var(--primary); }
+    .pp-switch .pp-knob {
+      position: absolute; top: 3px; left: 3px; width: 17px; height: 17px;
+      background: #fff; border-radius: 50%; transition: transform .18s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+    }
+    .pp-switch.on .pp-knob { transform: translateX(19px); }
+
+    .pp-warn {
+      margin: 0;
+      background: var(--amber-soft);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--amber) 22%, transparent);
+      color: var(--amber); border-radius: var(--r-lg);
+      padding: 10px 13px; font-size: var(--fs-sm); line-height: var(--lh-snug);
+    }
+    .pp-snip-all { width: 100%; }
+    .pp-links { display: flex; gap: var(--sp-2); }
+    .pp-links .btn { flex: 1 1 0; }
+
+    .pp-foot { margin-top: var(--sp-3); }
+    .pp-foot .btn { width: 100%; }
+  </style>
+</head>
+<body class="pp">
+  <header class="pp-top">
+    <span class="ds-side-brand"><img src="icons/logo.png" alt="" class="ds-side-logo" /></span>
+    <span class="ds-side-name" data-i18n="common.appName">Offiqa</span>
+    <span class="pp-actions">
+      <button class="pp-icon" id="popout" type="button"
+        data-i18n-attr="title:popup.popOut;aria-label:popup.popOut" title="Open in a window">⧉</button>
+      <button class="pp-icon" id="toggle-manage" type="button" aria-expanded="false"
+        data-i18n-attr="title:popup.settings;aria-label:popup.settings" title="Extension settings">⚙</button>
+    </span>
+  </header>
+
+  <!-- The Quick Note composer. Ctrl+Shift+Y opens this popup, so the shortcut
+       and the toolbar icon now land on the same surface. -->
+  <div class="pp-compose"><div id="quicknote-mount"></div></div>
+
+  <!-- Inbound capture, without the keyboard. The shortcut is faster, but a
+       shortcut Chrome fails to bind (a collision with another extension, or an
+       OS-level grab) fails invisibly — and a feature whose only entry point can
+       disappear without a message is a feature that will be reported as broken.
+       Clicking the toolbar icon grants activeTab exactly as the command does,
+       so this path needs nothing extra. Shown only when there is a selection. -->
+  <button class="btn sm pp-capture" id="capture-sel" hidden data-i18n="popup.captureCta">
+    Capture the selected text
+  </button>
+
+  <!-- Chrome drops a suggested shortcut that another extension already owns, and
+       says nothing: the command stays registered but unbound, so the feature
+       looks like it does not exist. This is the only place a user would find
+       out, so it says so here rather than only in the service-worker console. -->
+  <div class="pp-nokey" id="capture-nokey" hidden>
+    <span data-i18n="popup.captureNoKey">Capture has no keyboard shortcut — another extension has taken it.</span>
+    <button class="pp-nokey-btn" id="capture-setkey" type="button" data-i18n="popup.captureSetKey">Set one</button>
+  </div>
+
+  <!-- The HUD, without the keyboard. Same reasoning as capture above, and a
+       sharper need: a command ADDED to an already-installed extension is the
+       case Chrome is least reliable about binding, so the first users of this
+       feature are exactly the ones most likely to find the shortcut dead.
+       Unlike capture there is no selection to require — the panel is about the
+       tab as a whole, so the button is always available. -->
+  <button class="btn sm pp-capture" id="hud-open" hidden data-i18n="popup.hudCta">
+    Log to this client
+  </button>
+
+  <!-- Shown INSTEAD of the button on a page no extension may run in — which
+       includes Offiqa's own New Tab, the single most likely place someone is
+       standing when they go looking for this. Hiding the control there would
+       reproduce the exact failure it exists to fix: a feature that appears not
+       to exist, with nothing on screen to say why. -->
+  <div class="pp-nokey" id="hud-noplace" hidden>
+    <span data-i18n="popup.hudNoPlace">The log panel needs a normal web page — open the tab you're working in, then click the Offiqa icon.</span>
+  </div>
+
+  <div class="pp-nokey" id="hud-nokey" hidden>
+    <span data-i18n="popup.hudNoKey">The log panel has no keyboard shortcut — Chrome did not bind one.</span>
+    <button class="pp-nokey-btn" id="hud-setkey" type="button" data-i18n="popup.captureSetKey">Set one</button>
+  </div>
+
+  <!-- Attach the tab you are on to the selected workspace. The one thing a
+       workspace could not do until now: gain a tab after it was created. The
+       side panel offers the same button, but the panel is a place you go and
+       this is a place you already are — and unlike the panel it works on a page
+       no extension may run in, because the popup is not in the page. -->
+  <button class="btn sm pp-capture" id="attach-tab" hidden data-i18n="popup.attachCta">
+    Attach this tab
+  </button>
+
+  <!-- The context panel. Offered as a button and not only as Alt+O for the same
+       reason capture and the HUD are: a command added to an already-installed
+       extension frequently arrives unbound, and says nothing when it does. -->
+  <button class="btn sm pp-capture" id="open-panel" hidden data-i18n="popup.panelCta">
+    Open the context panel
+  </button>
+
+  <section class="pp-manage" id="manage-panel" hidden>
+   <div class="pp-manage-inner">
+    <div class="pp-card">
+      <div class="pp-card-main">
+        <div class="pp-card-title" data-i18n="popup.overrideTitle">New Tab override</div>
+        <div class="pp-card-desc" id="override-desc" data-i18n="popup.overrideDescReady">Offiqa is ready to manage your New Tab.</div>
+      </div>
+      <div class="pp-card-aside">
+        <!-- The status the header used to carry, now next to the switch that
+             changes it: here it is a label, not a decoration. -->
+        <span class="pp-status" id="override-status"><span class="pp-dot"></span><span class="pp-toggle-label" id="toggle-label" data-i18n="popup.statusActive">Active</span></span>
+        <button class="pp-switch on" id="override-toggle" role="switch" aria-checked="true"
+          data-i18n-attr="aria-label:popup.overrideToggleAria" aria-label="Toggle New Tab override"><span class="pp-knob"></span></button>
+      </div>
+    </div>
+
+    <p class="pp-warn" data-i18n="popup.warning">
+      Chrome controls the final New Tab confirmation. If you chose Switch back, enable Offiqa again in Chrome Extensions first.
+    </p>
+
+    <!-- Inline expander, per site. This card is the whole opt-in: nothing is
+         granted at install, and the switch below is what registers the content
+         script for the origin of the tab you were just on. -->
+    <div class="pp-card" id="snip-card" hidden>
+      <div class="pp-card-main">
+        <div class="pp-card-title" data-i18n="popup.snipTitle">Snippets on this site</div>
+        <div class="pp-card-desc" id="snip-desc" data-i18n="popup.snipDescOff">
+          Type <kbd>/</kbd><kbd>.</kbd> in any text box here to insert a saved reply.
+        </div>
+      </div>
+      <div class="pp-card-aside">
+        <button class="pp-switch" id="snip-toggle" role="switch" aria-checked="false"
+          data-i18n-attr="aria-label:popup.snipToggleAria" aria-label="Toggle snippets on this site"><span class="pp-knob"></span></button>
+      </div>
+    </div>
+
+    <!-- The wider answer, offered next to the narrow one rather than buried in
+         Settings: a shorthand you have to switch on per domain is one you stop
+         reaching for. Hidden once it is on — there is nothing left to offer. -->
+    <button class="btn sm pp-snip-all" id="snip-all" hidden data-i18n="popup.snipAllCta">
+      Turn on for every site
+    </button>
+
+    <div class="pp-card">
+      <div class="pp-card-main">
+        <div class="pp-card-title" data-i18n="popup.quickNoteTitle">Quick Note shortcut</div>
+        <div class="pp-card-desc" data-i18n-html="popup.quickNoteDesc">
+          Press <span id="sc-keys"><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd></span> from any tab to capture a note —
+          reminders, tags &amp; checklists included.
+        </div>
+      </div>
+    </div>
+
+    <div class="pp-links">
+      <button class="btn sm" id="change-shortcut" data-i18n="popup.changeShortcut">Change shortcut</button>
+      <button class="btn sm" id="manage" data-i18n="popup.manage">Manage</button>
+    </div>
+   </div>
+  </section>
+
+  <!-- Not primary any more. Save is the thing you came here to do; two blue
+       buttons on one 384px surface is two answers to "what now?". -->
+  <div class="pp-foot">
+    <button class="btn" id="open-offiqa">
+      <span data-i18n="popup.openOffiqa">Open Offiqa</span>
+      <svg class="pp-foot-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- the module manifest: which database a note from here belongs in -->
+  <script src="db-manifest.js"></script>
+  <script src="quicknote.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

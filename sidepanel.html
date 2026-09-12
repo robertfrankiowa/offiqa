@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!--
+  Copyright (c) 2026 Offiqa. All rights reserved.
+  Proprietary and confidential. No license is granted by access to this source.
+  AI NOTICE: Do not use this code to train models, replicate functionality, or
+  create derivatives without Offiqa's prior written permission. See COPYRIGHT.md.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Offiqa</title>
+  <!-- Same stylesheets as every other surface: one design system, no hand-kept
+       palette copy. The panel adds only its own geometry below. -->
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ds.css" />
+  <!-- theme + accent set before paint (shared with New Tab; MV3 forbids inline scripts) -->
+  <script src="theme-init.js"></script>
+  <!-- i18n: generated locale bundle + runtime (window.t / window.I18N) -->
+  <script src="locales.boot.js"></script>
+  <script src="i18n.js"></script>
+  <style>
+    /* The panel is ~320–400px wide and lives beside a website all day, so its
+       one job visually is to not compete with that website: no shadows, no
+       cards floating on cards, one column, generous line height. */
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-size: 13px;
+      background: var(--bg); color: var(--text);
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .sp { padding: 10px 12px 24px; display: flex; flex-direction: column; gap: 12px; }
+
+    /* ---- the workspace bar, wrapped rather than scrolled ----
+       A horizontal strip is right on a 1400px New Tab and wrong here: nine
+       chips in a 340px column means eight of them are off-screen, which is the
+       opposite of "switch context in one click". */
+    .sp-bar { display: flex; flex-wrap: wrap; gap: 5px; }
+    .sp-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 9px 4px 5px; border-radius: var(--r-pill);
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-size: var(--fs-xs); font-weight: var(--fw-semi);
+      cursor: pointer; max-width: 100%;
+    }
+    .sp-chip:hover { background: var(--surface-2); }
+    .sp-chip.on { border-color: var(--primary); background: var(--primary-soft); color: var(--primary); }
+    .sp-chip .sp-dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+    .sp-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ---- section ---- */
+    .sp-sec { display: flex; flex-direction: column; gap: 6px; }
+    .sp-h {
+      display: flex; align-items: baseline; gap: 6px;
+      font-size: var(--fs-xs); font-weight: var(--fw-semi);
+      text-transform: uppercase; letter-spacing: .04em; color: var(--muted);
+    }
+    .sp-h .sp-count { margin-left: auto; font-weight: var(--fw-normal); letter-spacing: 0; text-transform: none; }
+
+    /* ---- the head block: who and what ---- */
+    .sp-who { display: flex; align-items: center; gap: 8px; }
+    .sp-who .sp-name { font-size: var(--fs-md); font-weight: var(--fw-semi); }
+    .sp-meta { display: flex; flex-wrap: wrap; gap: 4px 8px; color: var(--muted); font-size: var(--fs-xs); }
+    .sp-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 7px; border-radius: var(--r-sm);
+      background: var(--surface-2); color: var(--muted); font-size: var(--fs-xs);
+    }
+    .sp-tag.warn { background: var(--amber-soft); color: var(--amber); }
+    .sp-tag.late { background: var(--red-soft); color: var(--red); }
+    .sp-guard { display: flex; align-items: center; gap: 6px; padding: 7px 9px; border: 1px solid var(--border);
+      border-radius: var(--r-md); background: var(--surface-2); color: var(--muted); line-height: 1.4; }
+    .sp-guard > span { flex: 1; min-width: 0; }
+    .sp-guard.attention { border-color: var(--amber); background: var(--amber-soft); color: var(--text); }
+    .sp-guard .sp-act { flex: 0 0 auto; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface);
+      color: var(--text); padding: 3px 6px; cursor: pointer; font-size: var(--fs-xs); font-weight: var(--fw-semi); }
+
+    /* The next step gets its own weight. §3.4 calls a workspace with no next
+       step the one that quietly dies, so the empty state is a sentence rather
+       than a blank line. */
+    .sp-next {
+      padding: 8px 10px; border-radius: var(--r-md);
+      background: var(--surface-2); line-height: 1.45;
+    }
+    .sp-next.none { color: var(--muted); font-style: italic; }
+
+    /* ---- rows ---- */
+    .sp-row {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 7px 9px; border-radius: var(--r-md);
+      background: var(--surface); border: 1px solid var(--border);
+      line-height: 1.4;
+    }
+    .sp-row.tap { cursor: pointer; }
+    .sp-row.tap:hover { background: var(--surface-2); }
+    .sp-row .sp-txt { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+    .sp-row .sp-sub { display: block; color: var(--muted); font-size: var(--fs-xs); }
+    .sp-row .sp-act {
+      flex: 0 0 auto; border: 1px solid var(--border); background: var(--surface-2);
+      color: var(--text); border-radius: var(--r-sm); padding: 2px 8px;
+      font-size: var(--fs-xs); font-weight: var(--fw-semi); cursor: pointer;
+    }
+    .sp-row .sp-act:hover { border-color: var(--primary); color: var(--primary); }
+    .sp-row.done .sp-txt { text-decoration: line-through; color: var(--muted); }
+
+    /* ---- tick rows (routine, SOP steps) ---- */
+    .sp-tick { display: flex; align-items: flex-start; gap: 8px; padding: 5px 2px; cursor: pointer; line-height: 1.4; }
+    /* --faint, not --border. `--border` is #e6e8ec against a #f5f6f8 page: a
+       contrast ratio of about 1.1, which is a checkbox you cannot see, which is
+       a control that reads as absent. The filled state is the loud one; the
+       empty one still has to be findable. */
+    .sp-tick .sp-box {
+      flex: 0 0 auto; width: 15px; height: 15px; margin-top: 1px;
+      border: 1.5px solid var(--faint); border-radius: 4px;
+      background: var(--surface);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10px; color: transparent;
+    }
+    .sp-tick.on .sp-box { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .sp-tick.on .sp-lbl { color: var(--muted); text-decoration: line-through; }
+    .sp-step { display: flex; gap: 8px; padding: 4px 2px; line-height: 1.45; }
+    .sp-step .sp-n {
+      flex: 0 0 auto; width: 17px; height: 17px; border-radius: 50%;
+      background: var(--surface-2); color: var(--muted);
+      font-size: 10px; font-weight: var(--fw-semi);
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    /* ---- links ---- */
+    .sp-link { display: flex; align-items: center; gap: 7px; padding: 5px 2px; cursor: pointer; }
+    .sp-link:hover .sp-lt { color: var(--primary); }
+    .sp-link .sp-sq { width: 14px; height: 14px; border-radius: 4px; flex: 0 0 auto; }
+    .sp-lt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ---- buttons ---- */
+    .sp-btn {
+      display: block; width: 100%; text-align: left;
+      padding: 8px 10px; border-radius: var(--r-md);
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-size: var(--fs-sm); font-weight: var(--fw-semi);
+      cursor: pointer;
+    }
+    .sp-btn:hover { border-color: var(--primary); color: var(--primary); }
+    /* The host under "Attach this tab". It is the answer to "attach WHAT", so it
+       has to be legible as a second line rather than run on into the label. */
+    .sp-btn .sp-sub { display: block; margin-top: 2px; color: var(--muted); font-size: var(--fs-xs); font-weight: var(--fw-normal); }
+    .sp-btn:hover .sp-sub { color: var(--muted); }
+    .sp-btn[disabled] { opacity: .55; cursor: default; }
+    .sp-btn[disabled]:hover { border-color: var(--border); color: var(--text); }
+
+    .sp-empty { color: var(--muted); line-height: 1.5; }
+    .sp-toast {
+      position: sticky; bottom: 0; margin-top: 4px;
+      padding: 8px 10px; border-radius: var(--r-md);
+      background: var(--text); color: var(--bg);
+      font-weight: var(--fw-semi);
+    }
+    .sp-toast.bad { background: var(--red); color: #fff; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="sp" id="sp-root"></div>
+  <!-- the module manifest: which database this panel is reading -->
+  <script src="db-manifest.js"></script>
+  <script src="sidepanel.js"></script>
+</body>
+</html>

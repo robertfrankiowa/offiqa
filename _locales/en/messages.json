@@ -1,0 +1,35 @@
+{
+  "appName": {
+    "message": "Offiqa — New Tab"
+  },
+  "appDescription": {
+    "message": "A calm context-workspace layer for your New Tab: workspaces, meetings, quick notes, reminders and focus sessions."
+  },
+  "actionTitle": {
+    "message": "Offiqa"
+  },
+  "commandOpenQuickNote": {
+    "message": "Open Offiqa quick note"
+  },
+  "expanderHint": {
+    "message": "↑↓ to move · Enter to insert · Esc to close"
+  },
+  "expanderHintEsc": {
+    "message": "Esc to close"
+  },
+  "expanderNoMatch": {
+    "message": "No reply matches that."
+  },
+  "expanderEmpty": {
+    "message": "No saved replies yet — add one in Offiqa."
+  },
+  "commandCaptureSelection": {
+    "message": "Capture the selected text into Offiqa"
+  },
+  "commandOpenHud": {
+    "message": "Log to Offiqa without leaving the page"
+  },
+  "commandOpenPanel": {
+    "message": "Open the Offiqa context panel"
+  }
+}
