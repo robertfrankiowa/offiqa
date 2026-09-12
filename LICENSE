@@ -1,0 +1,56 @@
+OFFIQA PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2026 Offiqa. All rights reserved.
+
+1. Ownership
+
+This repository, including its source code, documentation, designs, assets,
+generated artifacts, and all derivative works (collectively, the "Software"),
+is proprietary to Offiqa and its applicable licensors. This Software is not
+open source software.
+
+2. Source Availability and No Product License
+
+The Software may be publicly visible solely to support transparency, security
+review, and privacy verification. It is source-available, not open source.
+
+Except for the limited rights that GitHub's Terms of Service require for users
+to view, display, and reproduce the Software by forking it through GitHub,
+access to, possession of, or visibility into the Software does not grant any
+license or other right, whether express, implied, by estoppel, or otherwise.
+No right to use, modify, distribute outside GitHub's service functionality,
+publish, disclose, sublicense, reverse engineer, decompile, or create
+derivative works is granted except as expressly set out in a written agreement
+signed by an authorized representative of Offiqa.
+
+3. Restrictions
+
+Except for the limited GitHub viewing and forking rights described in Section 2,
+without Offiqa's prior written permission, you must not:
+
+- copy, reproduce, modify, distribute, publish, sell, lease, or disclose any
+  portion of the Software;
+- reverse engineer, decompile, disassemble, or otherwise attempt to derive the
+  source, structure, functionality, or design of the Software;
+- use the Software or any portion of it to train, tune, benchmark, evaluate, or
+  improve an artificial-intelligence or machine-learning system;
+- submit the Software to an AI system or automated service for the purpose of
+  replicating its functionality, structure, design, or implementation; or
+- generate, develop, or assist in developing substantially similar or
+  derivative code, designs, or products from the Software.
+
+4. Authorized Use
+
+Any authorized use is limited to the scope, duration, and conditions of the
+applicable written agreement with Offiqa. All rights not expressly granted are
+reserved by Offiqa.
+
+5. Third-Party Materials
+
+Third-party materials included with the Software remain subject to their own
+license terms and notices. Nothing in this license changes those terms.
+
+6. Contact
+
+For licensing or other permission requests, contact Offiqa through its
+authorized business channel.
