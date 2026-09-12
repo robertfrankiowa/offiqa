@@ -50,6 +50,10 @@ Google's own privacy terms govern data processed by Google after it reaches
 Google services. Do not enable this feature if you do not want backup data sent
 to Google.
 
+Offiqa's use and transfer to any other app of information received from Google
+APIs adheres to the Chrome Web Store User Data Policy, including the Limited Use
+requirements.
+
 ### Website favicons and user-opened links
 
 When you add a website link, Offiqa may request that site's hostname from
